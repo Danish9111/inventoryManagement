@@ -1,6 +1,7 @@
 import 'package:dream_pos/screens/barcode/barcode_screen.dart';
 import 'package:dream_pos/screens/expenses/expensesListScreen/expenseListScreen.dart';
 import 'package:dream_pos/screens/products/ProductListScreen/productListScreen.dart';
+import 'package:dream_pos/screens/reports/reports_screen.dart';
 import 'package:dream_pos/screens/sales/sales_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -61,13 +62,16 @@ class _AppShellState extends State<AppShell> {
                     navigateTo(3, const SalesScreen());
                     break;
                   case 4:
-                    navigateTo(4, const BarcodeScreen());
+                    navigateTo(4, const ReportsScreen());
                     break;
                   case 5:
-                    navigateTo(5, const ExpenseListScreen());
+                    navigateTo(5, const BarcodeScreen());
                     break;
                   case 6:
-                    navigateTo(6, const SettingsScreen());
+                    navigateTo(6, const ExpenseListScreen());
+                    break;
+                  case 7:
+                    navigateTo(7, const SettingsScreen());
                     break;
                 }
               },
