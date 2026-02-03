@@ -60,6 +60,22 @@ class Product {
     this.barcode,
   });
 
+  factory Product.empty() => const Product(
+    id: '',
+    name: '',
+    slug: '',
+    sku: '',
+    sellingType: '',
+    category: '',
+    subCategory: '',
+    brand: '',
+    unit: '',
+    quantity: 0,
+    price: 0,
+    quantityAlert: 0,
+    images: [],
+  );
+
   // Get unique categories
   static List<String> get categories {
     final cats = productsList.map((p) => p.category).toSet().toList();

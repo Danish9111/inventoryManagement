@@ -39,26 +39,26 @@ class SampleReportData {
   ];
 
   // === KPI STATS ===
-  static List<StatCard> get todayStats => [
-    const StatCard(
+  static List<Stat> get todayStats => [
+    const Stat(
       label: "Today's Revenue",
       value: '\$4,285.00',
       change: '+12.5%',
       isPositive: true,
     ),
-    const StatCard(
+    const Stat(
       label: 'Total Orders',
       value: '47',
       change: '+8 orders',
       isPositive: true,
     ),
-    const StatCard(
+    const Stat(
       label: 'Avg. Order Value',
       value: '\$91.17',
       change: '+3.2%',
       isPositive: true,
     ),
-    const StatCard(
+    const Stat(
       label: 'Items Sold',
       value: '156',
       change: '+24 items',

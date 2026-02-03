@@ -14,13 +14,13 @@ class ReportType {
 }
 
 /// KPI Stat Card Model
-class StatCard {
+class Stat {
   final String label;
   final String value;
   final String? change;
   final bool isPositive;
 
-  const StatCard({
+  const Stat({
     required this.label,
     required this.value,
     this.change,

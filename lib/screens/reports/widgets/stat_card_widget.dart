@@ -5,7 +5,7 @@ import '../reports_responsive_helper.dart';
 
 /// KPI Stat Card Widget - Displays key metrics
 class StatCardWidget extends StatelessWidget {
-  final StatCard stat;
+  final Stat stat;
   final ReportsResponsiveHelper responsive;
 
   const StatCardWidget({

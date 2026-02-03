@@ -1,4 +1,6 @@
+import 'package:dream_pos/screens/reports/providers/report_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/appColors.dart';
 import 'data/sample_report_data.dart';
 import 'models/report_models.dart';
@@ -10,14 +12,14 @@ import 'widgets/payment_chart_widget.dart';
 import 'widgets/products_table_widget.dart';
 
 /// 📊 Reports Screen
-class ReportsScreen extends StatefulWidget {
+class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
 
   @override
-  State<ReportsScreen> createState() => _ReportsScreenState();
+  ConsumerState<ReportsScreen> createState() => _ReportsScreenState();
 }
 
-class _ReportsScreenState extends State<ReportsScreen>
+class _ReportsScreenState extends ConsumerState<ReportsScreen>
     with SingleTickerProviderStateMixin {
   DateFilterOption _selectedDateFilter = DateFilterOption.thisWeek;
   late AnimationController _controller;
@@ -99,7 +101,7 @@ class _ReportsScreenState extends State<ReportsScreen>
 
 /* ───────────────────────── HEADER ───────────────────────── */
 
-class ReportsHeader extends StatefulWidget {
+class ReportsHeader extends ConsumerWidget {
   final ReportsResponsiveHelper responsive;
   final DateFilterOption selectedDateFilter;
   final ValueChanged<DateFilterOption> onDateChanged;
@@ -114,13 +116,10 @@ class ReportsHeader extends StatefulWidget {
   });
 
   @override
-  State<ReportsHeader> createState() => _ReportsHeaderState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reportsState = ref.watch(reportsProvider);
 
-class _ReportsHeaderState extends State<ReportsHeader> {
-  @override
-  Widget build(BuildContext context) {
-    final r = widget.responsive;
+    final r = responsive;
 
     return r.useWideLayout
         ? Row(
@@ -183,14 +182,14 @@ class _ReportsHeaderState extends State<ReportsHeader> {
       spacing: r.scale(10, 16),
       children: [
         DateFilterWidget(
-          selectedOption: widget.selectedDateFilter,
-          onChanged: widget.onDateChanged,
+          selectedOption: selectedDateFilter,
+          onChanged: onDateChanged,
           responsive: r,
         ),
         ExportButton(
           label: 'Export',
           icon: Icons.download_rounded,
-          onPressed: widget.onExport,
+          onPressed: onExport,
           responsive: r,
         ),
       ],
@@ -200,14 +199,16 @@ class _ReportsHeaderState extends State<ReportsHeader> {
 
 /* ───────────────────────── STATS ───────────────────────── */
 
-class ReportsStatsSection extends StatelessWidget {
+class ReportsStatsSection extends ConsumerWidget {
   final ReportsResponsiveHelper responsive;
 
   const ReportsStatsSection({super.key, required this.responsive});
 
   @override
-  Widget build(BuildContext context) {
-    final stats = SampleReportData.todayStats;
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final stats = SampleReportData.todayStats;
+    final reportsState = ref.watch(reportsProvider);
+    final stats = reportsState.stats;
 
     return GridView.builder(
       shrinkWrap: true,
@@ -227,13 +228,14 @@ class ReportsStatsSection extends StatelessWidget {
 
 /* ───────────────────────── CHARTS ───────────────────────── */
 
-class ReportsChartsSection extends StatelessWidget {
+class ReportsChartsSection extends ConsumerWidget {
   final ReportsResponsiveHelper responsive;
 
   const ReportsChartsSection({super.key, required this.responsive});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final reportsState = ref.watch(reportsProvider);
     if (responsive.useExtraWideLayout) {
       return Row(
         children: [
@@ -241,7 +243,7 @@ class ReportsChartsSection extends StatelessWidget {
             flex: 3,
             child: SalesChartWidget(
               title: 'Weekly Sales Overview',
-              data: SampleReportData.weeklySales,
+              data: reportsState.weeklySales,
               responsive: responsive,
             ),
           ),
@@ -250,7 +252,7 @@ class ReportsChartsSection extends StatelessWidget {
             flex: 3,
             child: PaymentChartWidget(
               title: 'Payment Methods',
-              data: SampleReportData.paymentBreakdown,
+              data: reportsState.paymentBackground,
               responsive: responsive,
             ),
           ),
@@ -262,13 +264,13 @@ class ReportsChartsSection extends StatelessWidget {
       children: [
         SalesChartWidget(
           title: 'Weekly Sales Overview',
-          data: SampleReportData.weeklySales,
+          data: reportsState.weeklySales,
           responsive: responsive,
         ),
         SizedBox(height: responsive.reportCardSpacing),
         PaymentChartWidget(
           title: 'Payment Methods',
-          data: SampleReportData.paymentBreakdown,
+          data: reportsState.paymentBackground,
           responsive: responsive,
         ),
       ],
