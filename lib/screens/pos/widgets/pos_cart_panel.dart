@@ -47,7 +47,7 @@ class PosCartPanel extends ConsumerWidget {
               slivers: [
                 // Header (Scrolls away now)
                 SliverToBoxAdapter(
-                  child: _buildCartHeaderCompact(
+                  child: _buildCartHeader(
                     r,
                     cartItems.isNotEmpty,
                     cartNotifier.clearCart,
@@ -57,6 +57,8 @@ class PosCartPanel extends ConsumerWidget {
                 // Customer Management Section
                 SliverToBoxAdapter(
                   child: _buildCustomerSection(
+                    context,
+
                     r,
                     cartState.selectedCustomer,
                     cartNotifier.setCustomer,
@@ -139,7 +141,7 @@ class PosCartPanel extends ConsumerWidget {
     );
   }
 
-  Widget _buildCartHeaderCompact(
+  Widget _buildCartHeader(
     PosResponsiveHelper r,
     bool hasItems,
     VoidCallback onClear,
@@ -216,6 +218,7 @@ class PosCartPanel extends ConsumerWidget {
   }
 
   Widget _buildCustomerSection(
+    BuildContext context,
     PosResponsiveHelper r,
     String selectedCustomer,
     Function(String) onCustomerChanged,
@@ -296,7 +299,7 @@ class PosCartPanel extends ConsumerWidget {
                 icon: Icons.person_add_outlined,
                 color: AppColors.primaryBlue,
                 onTap: () {
-                  // TODO: Add new customer
+                  _showAddCustomerDialog(context);
                 },
                 r: r,
               ),
@@ -312,6 +315,37 @@ class PosCartPanel extends ConsumerWidget {
                 r: r,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddCustomerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Customer'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(decoration: const InputDecoration(labelText: 'Name')),
+            TextField(decoration: const InputDecoration(labelText: 'Email')),
+            TextField(decoration: const InputDecoration(labelText: 'Phone')),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Add'),
           ),
         ],
       ),

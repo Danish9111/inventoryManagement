@@ -1,15 +1,23 @@
-import 'package:dream_pos/screens/dashBoard/models/feature_model.dart';
-import 'package:dream_pos/screens/dashBoard/responsive_helper.dart';
-import 'package:dream_pos/screens/dashBoard/widgets/feature_card.dart';
-import 'package:dream_pos/screens/dashBoard/widgets/summary_card.dart';
+import 'package:dream_pos/screens/dashboard/models/feature_model.dart';
+import 'package:dream_pos/screens/dashboard/responsive_helper.dart';
+import 'package:dream_pos/screens/dashboard/widgets/summary_card.dart';
+import 'package:dream_pos/screens/dashboard/widgets/feature_card.dart';
+import 'package:dream_pos/screens/dashboard/providers/feature_item_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/appColors.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
   Widget build(BuildContext context) {
+    final featuresItem = ref.watch(featureItemProvider);
     return Container(
       color: AppColors.backgroundGrey,
       child: LayoutBuilder(
@@ -27,17 +35,17 @@ class DashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header - Responsive
-                _buildHeader(responsive),
+                HeaderSection(responsive: responsive),
                 SizedBox(height: responsive.sectionSpacing),
 
-                // 🔹 FEATURE CARDS SECTION
-                _buildFeatureCardsSection(context, responsive),
+                FeaturedCardSection(
+                  featuresItem: featuresItem,
+                  responsive: responsive,
+                ),
 
                 SizedBox(height: responsive.sectionSpacing * 1.3),
 
-                // 🔹 SUMMARY SECTION
-                _buildSummarySection(context, responsive),
+                SummarySection(responsive: responsive),
               ],
             ),
           );
@@ -45,9 +53,13 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  /// 🔸 RESPONSIVE HEADER
-  Widget _buildHeader(ResponsiveHelper responsive) {
+class HeaderSection extends StatelessWidget {
+  final ResponsiveHelper responsive;
+  const HeaderSection({super.key, required this.responsive});
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,78 +82,14 @@ class DashboardScreen extends StatelessWidget {
       ],
     );
   }
+}
 
-  /// 🔸 FEATURE CARDS SECTION - Fully Responsive with Fluid Scaling
-  Widget _buildFeatureCardsSection(
-    BuildContext context,
-    ResponsiveHelper responsive,
-  ) {
-    final features = [
-      FeatureItem(
-        icon: Icons.point_of_sale_rounded,
-        title: 'New Sales',
-        subtitle: 'Create a new sales order',
-        iconColor: AppColors.salesOrange,
-        bgColor: AppColors.salesOrangeLight,
-      ),
-      FeatureItem(
-        icon: Icons.add_shopping_cart_rounded,
-        title: 'New Purchase',
-        subtitle: 'Record new purchases',
-        iconColor: AppColors.purchaseGreen,
-        bgColor: AppColors.purchaseGreenLight,
-      ),
-      FeatureItem(
-        icon: Icons.inventory_2_rounded,
-        title: 'Products',
-        subtitle: 'Manage your inventory',
-        iconColor: AppColors.productsPurple,
-        bgColor: AppColors.productsPurpleLight,
-      ),
-      FeatureItem(
-        icon: Icons.analytics_rounded,
-        title: 'Reports',
-        subtitle: 'View sales and analytics',
-        iconColor: AppColors.reportsPink,
-        bgColor: AppColors.reportsPinkLight,
-      ),
-      FeatureItem(
-        icon: Icons.people_alt_rounded,
-        title: 'Customers',
-        subtitle: 'Manage customer data',
-        iconColor: AppColors.customersTeal,
-        bgColor: AppColors.customersTealLight,
-      ),
-      FeatureItem(
-        icon: Icons.receipt_long_rounded,
-        title: 'Expenses',
-        subtitle: 'Track business expenses',
-        iconColor: AppColors.expensesRed,
-        bgColor: AppColors.expensesRedLight,
-      ),
-    ];
+class SummarySection extends StatelessWidget {
+  final ResponsiveHelper responsive;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: responsive.featureGridColumns,
-        crossAxisSpacing: responsive.gridSpacing,
-        mainAxisSpacing: responsive.gridSpacing,
-        childAspectRatio: responsive.featureCardAspectRatio,
-      ),
-      itemCount: features.length,
-      itemBuilder: (context, index) {
-        return FeatureCard(feature: features[index], responsive: responsive);
-      },
-    );
-  }
-
-  /// 🔸 SUMMARY SECTION - Responsive
-  Widget _buildSummarySection(
-    BuildContext context,
-    ResponsiveHelper responsive,
-  ) {
+  const SummarySection({super.key, required this.responsive});
+  @override
+  Widget build(BuildContext context) {
     final summaryCards = [
       SummaryCard(
         icon: Icons.attach_money_rounded,
@@ -214,6 +162,37 @@ class DashboardScreen extends StatelessWidget {
                 .toList(),
           ),
       ],
+    );
+  }
+}
+
+class FeaturedCardSection extends ConsumerWidget {
+  final ResponsiveHelper responsive;
+  final List<FeatureItem> featuresItem;
+  const FeaturedCardSection({
+    super.key,
+    required this.responsive,
+    required this.featuresItem,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: responsive.featureGridColumns,
+        crossAxisSpacing: responsive.gridSpacing,
+        mainAxisSpacing: responsive.gridSpacing,
+        childAspectRatio: responsive.featureCardAspectRatio,
+      ),
+      itemCount: featuresItem.length,
+      itemBuilder: (context, index) {
+        return FeatureCard(
+          feature: featuresItem[index],
+          responsive: responsive,
+        );
+      },
     );
   }
 }
