@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/customer_model.dart';
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 
 class CustomerListTile extends StatelessWidget {
   final Customer customer;

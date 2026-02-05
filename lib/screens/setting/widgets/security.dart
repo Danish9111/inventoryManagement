@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:dream_pos/widgets/customButtons.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 

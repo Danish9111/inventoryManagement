@@ -11,7 +11,7 @@ import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/screens/products/providers/product_provider.dart';
 import 'package:dream_pos/screens/sales/models/sale_model.dart';
 import 'package:dream_pos/screens/sales/providers/sales_provider.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:dream_pos/widgets/hardware_scanner_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

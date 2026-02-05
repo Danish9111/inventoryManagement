@@ -2,7 +2,7 @@ import 'package:dream_pos/screens/barcode/barcode_responsive_helper.dart';
 import 'package:dream_pos/screens/products/data/productsData.dart';
 import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/services/barcode_service.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:dream_pos/widgets/hardware_scanner_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

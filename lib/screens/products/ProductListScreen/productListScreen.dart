@@ -8,7 +8,7 @@ import 'package:dream_pos/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 import '../add_product_screen.dart';
 
 class ProductListScreen extends ConsumerStatefulWidget {

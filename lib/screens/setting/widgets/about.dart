@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 
 class AboutPosUI extends StatelessWidget {
   const AboutPosUI({super.key});
@@ -32,7 +32,7 @@ class AboutPosUI extends StatelessWidget {
                       icon: Icons.info_outline,
                       title: 'About Dream POS',
                       description:
-                      'A modern point-of-sale system designed for fast billing, '
+                          'A modern point-of-sale system designed for fast billing, '
                           'reliable performance, and smooth daily operations on tablet devices.',
                     ),
 
@@ -42,28 +42,28 @@ class AboutPosUI extends StatelessWidget {
                       icon: Icons.flash_on_outlined,
                       title: 'Built for speed',
                       description:
-                      'Optimized workflows ensure quick billing and reduced checkout time.',
+                          'Optimized workflows ensure quick billing and reduced checkout time.',
                     ),
 
                     _infoRow(
                       icon: Icons.print_outlined,
                       title: 'Printer ready',
                       description:
-                      'Works seamlessly with Bluetooth receipt printers (58mm & 80mm).',
+                          'Works seamlessly with Bluetooth receipt printers (58mm & 80mm).',
                     ),
 
                     _infoRow(
                       icon: Icons.cloud_off_outlined,
                       title: 'Offline capable',
                       description:
-                      'Continue billing even without internet connectivity.',
+                          'Continue billing even without internet connectivity.',
                     ),
 
                     _infoRow(
                       icon: Icons.touch_app_outlined,
                       title: 'Tablet optimized',
                       description:
-                      'Designed specifically for landscape tablet usage in stores.',
+                          'Designed specifically for landscape tablet usage in stores.',
                     ),
 
                     _divider(),
@@ -215,19 +215,13 @@ class AboutPosUI extends StatelessWidget {
             width: 80,
             child: Text(
               label,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.black54,
-              ),
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -240,10 +234,7 @@ class AboutPosUI extends StatelessWidget {
   Widget _divider() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Divider(
-        height: 1,
-        color: Colors.black.withOpacity(0.08),
-      ),
+      child: Divider(height: 1, color: Colors.black.withOpacity(0.08)),
     );
   }
 

@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import 'appColors.dart';
+import '../constants/appColors.dart';
 
 void showCustomSnackBar(
   BuildContext context, {

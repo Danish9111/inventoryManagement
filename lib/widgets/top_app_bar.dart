@@ -1,6 +1,6 @@
 import 'package:dream_pos/screens/barcode/barcode_screen.dart';
 import 'package:dream_pos/screens/setting/settings_screen.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/pos/pos_screen.dart';

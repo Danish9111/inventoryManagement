@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import '../sales_responsive_helper.dart';
 
 /// Quick stats cards showing today's summary

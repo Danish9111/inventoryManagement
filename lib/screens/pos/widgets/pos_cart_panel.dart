@@ -1,7 +1,7 @@
 import 'package:dream_pos/screens/pos/cart_provider.dart';
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/screens/pos/widgets/cart_item_tile.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

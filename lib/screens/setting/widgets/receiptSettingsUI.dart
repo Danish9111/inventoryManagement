@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 
 class ReceiptSettingsUI extends StatefulWidget {
   const ReceiptSettingsUI({super.key});
@@ -11,20 +11,25 @@ class ReceiptSettingsUI extends StatefulWidget {
 class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
   // ───────────────── CONTROLLERS ─────────────────
 
-  final TextEditingController shopNameCtrl =
-  TextEditingController(text: 'My Retail Shop');
+  final TextEditingController shopNameCtrl = TextEditingController(
+    text: 'My Retail Shop',
+  );
 
-  final TextEditingController addressCtrl =
-  TextEditingController(text: '123 Main Street, City, State - 123456');
+  final TextEditingController addressCtrl = TextEditingController(
+    text: '123 Main Street, City, State - 123456',
+  );
 
-  final TextEditingController phoneCtrl =
-  TextEditingController(text: '+1 234 567 8900');
+  final TextEditingController phoneCtrl = TextEditingController(
+    text: '+1 234 567 8900',
+  );
 
-  final TextEditingController taxCtrl =
-  TextEditingController(text: '22AAAAA0000A1Z5');
+  final TextEditingController taxCtrl = TextEditingController(
+    text: '22AAAAA0000A1Z5',
+  );
 
-  final TextEditingController footerCtrl =
-  TextEditingController(text: 'Thank you for your business!');
+  final TextEditingController footerCtrl = TextEditingController(
+    text: 'Thank you for your business!',
+  );
 
   // ───────────────── OPTIONS ─────────────────
 
@@ -63,10 +68,7 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _input(
-                        label: 'Shop name',
-                        controller: shopNameCtrl,
-                      ),
+                      _input(label: 'Shop name', controller: shopNameCtrl),
                       const SizedBox(height: 20),
 
                       _input(
@@ -83,16 +85,10 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
                       ),
                       const SizedBox(height: 20),
 
-                      _input(
-                        label: 'Tax ID / GST number',
-                        controller: taxCtrl,
-                      ),
+                      _input(label: 'Tax ID / GST number', controller: taxCtrl),
                       const SizedBox(height: 28),
 
-                      _input(
-                        label: 'Footer message',
-                        controller: footerCtrl,
-                      ),
+                      _input(label: 'Footer message', controller: footerCtrl),
 
                       const SizedBox(height: 32),
                       const Divider(height: 1),
@@ -114,8 +110,7 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
                       _checkbox(
                         label: 'Show tax breakdown',
                         value: showTaxBreakdown,
-                        onChanged: (v) =>
-                            setState(() => showTaxBreakdown = v),
+                        onChanged: (v) => setState(() => showTaxBreakdown = v),
                       ),
                       _checkbox(
                         label: 'Auto-print after payment',
@@ -135,7 +130,6 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
       ),
     );
   }
-
 
   Widget _heroHeader() {
     return Container(
@@ -193,7 +187,6 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
     );
   }
 
-
   // ───────────────── INPUT ─────────────────
 
   Widget _input({
@@ -244,10 +237,7 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
       onChanged: (v) => onChanged(v!),
       title: Text(
         label,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -294,10 +284,7 @@ class _ReceiptSettingsUIState extends State<ReceiptSettingsUI> {
   Widget _sectionTitle(String text) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w600,
-      ),
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
     );
   }
 }

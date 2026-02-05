@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 
 class CustomerHeader extends StatelessWidget {
   final VoidCallback onAddCustomer;

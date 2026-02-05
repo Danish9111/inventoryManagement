@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Assuming these exist based on your imports
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 import 'providers/customer_provider.dart';
 import 'widgets/customer_header.dart';
 import 'widgets/customer_filters.dart';

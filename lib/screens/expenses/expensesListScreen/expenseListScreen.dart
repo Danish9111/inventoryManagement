@@ -4,7 +4,7 @@ import 'package:dream_pos/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 import 'expenseListFilters.dart';
 import 'expenseListHeader.dart';
 import 'expenseTableHeader.dart';

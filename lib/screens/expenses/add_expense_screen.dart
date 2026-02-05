@@ -9,7 +9,7 @@ import 'package:dream_pos/widgets/customButtons.dart';
 import 'package:dream_pos/widgets/customSnackBar.dart';
 import 'package:flutter/material.dart';
 
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 import '../../widgets/customDropDown.dart';
 import '../../widgets/date_picker_bottom_sheet.dart';
 import 'model/expense.dart';

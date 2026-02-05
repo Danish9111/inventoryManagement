@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 
 enum CustomerFilter { highSpender, highLoyalty, newCustomer }
 
@@ -12,40 +12,12 @@ enum CustomerSort {
   oldest,
 }
 
-String _filterLabel(CustomerFilter filter) {
-  switch (filter) {
-    case CustomerFilter.highSpender:
-      return 'High spenders';
-    case CustomerFilter.highLoyalty:
-      return 'High loyalty';
-    case CustomerFilter.newCustomer:
-      return 'New customers';
-  }
-}
-
-String _sortLabel(CustomerSort sort) {
-  switch (sort) {
-    case CustomerSort.nameAsc:
-      return 'Name (A-Z)';
-    case CustomerSort.nameDesc:
-      return 'Name (Z-A)';
-    case CustomerSort.totalSpentDesc:
-      return 'Total spent (high → low)';
-    case CustomerSort.totalSpentAsc:
-      return 'Total spent (low → high)';
-    case CustomerSort.newest:
-      return 'Newest first';
-    case CustomerSort.oldest:
-      return 'Oldest first';
-  }
-}
-
 class CustomerFilters extends StatelessWidget {
-  final ValueChanged<String> onSearch;
+  final Function(String) onSearch;
   final Set<CustomerFilter> activeFilters;
-  final ValueChanged<Set<CustomerFilter>> onFiltersChanged;
+  final Function(Set<CustomerFilter>) onFiltersChanged;
   final CustomerSort sortBy;
-  final ValueChanged<CustomerSort> onSortChanged;
+  final Function(CustomerSort) onSortChanged;
 
   const CustomerFilters({
     super.key,
@@ -92,96 +64,148 @@ class CustomerFilters extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
-        _filterMenu(context),
+
+        // Filter Menu
+        PopupMenuButton<CustomerFilter>(
+          offset: const Offset(0, 50),
+          tooltip: 'Filter',
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          onSelected: (filter) {
+            final newFilters = Set<CustomerFilter>.from(activeFilters);
+            if (newFilters.contains(filter)) {
+              newFilters.remove(filter);
+            } else {
+              newFilters.add(filter);
+            }
+            onFiltersChanged(newFilters);
+          },
+          itemBuilder: (context) => [
+            _buildFilterItem(
+              CustomerFilter.highSpender,
+              'High Spender (> \$1k)',
+            ),
+            _buildFilterItem(
+              CustomerFilter.highLoyalty,
+              'High Loyalty (> 100pts)',
+            ),
+            _buildFilterItem(
+              CustomerFilter.newCustomer,
+              'New Customer (< 30 days)',
+            ),
+          ],
+          child: _filterButton(
+            Icons.filter_list_rounded,
+            'Filter',
+            isActive: activeFilters.isNotEmpty,
+          ),
+        ),
+
         const SizedBox(width: 12),
-        _sortMenu(context),
+
+        // Sort Menu
+        PopupMenuButton<CustomerSort>(
+          offset: const Offset(0, 50),
+          tooltip: 'Sort',
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          onSelected: onSortChanged,
+          initialValue: sortBy,
+          itemBuilder: (context) => [
+            _buildSortItem(CustomerSort.nameAsc, 'Name (A-Z)'),
+            _buildSortItem(CustomerSort.nameDesc, 'Name (Z-A)'),
+            _buildSortItem(CustomerSort.totalSpentDesc, 'Highest Spender'),
+            _buildSortItem(CustomerSort.totalSpentAsc, 'Lowest Spender'),
+            _buildSortItem(CustomerSort.newest, 'Newest First'),
+            _buildSortItem(CustomerSort.oldest, 'Oldest First'),
+          ],
+          child: _filterButton(
+            Icons.sort_rounded,
+            'Sort',
+            isActive:
+                false, // Sort is always active/selected, no "active state" needed
+          ),
+        ),
       ],
     );
   }
 
-  Widget _filterMenu(BuildContext context) {
-    return PopupMenuButton<String>(
-      color: AppColors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      tooltip: 'Filters',
-      onSelected: (value) {
-        if (value == 'clear') {
-          onFiltersChanged({});
-          return;
-        }
-        final filter = CustomerFilter.values.firstWhere(
-          (f) => f.toString() == value,
-        );
-        final updated = {...activeFilters};
-        if (updated.contains(filter)) {
-          updated.remove(filter);
-        } else {
-          updated.add(filter);
-        }
-        onFiltersChanged(updated);
-      },
-      itemBuilder: (context) {
-        return [
-          ...CustomerFilter.values.map((filter) {
-            final isSelected = activeFilters.contains(filter);
-            return CheckedPopupMenuItem<String>(
-              value: filter.toString(),
-              checked: isSelected,
-              child: Text(_filterLabel(filter)),
-            );
-          }),
-          const PopupMenuDivider(),
-          const PopupMenuItem<String>(
-            value: 'clear',
-            child: Text('Clear filters'),
+  PopupMenuItem<CustomerFilter> _buildFilterItem(
+    CustomerFilter filter,
+    String label,
+  ) {
+    final isSelected = activeFilters.contains(filter);
+    return PopupMenuItem(
+      value: filter,
+      child: Row(
+        children: [
+          Icon(
+            isSelected
+                ? Icons.check_box_rounded
+                : Icons.check_box_outline_blank_rounded,
+            color: isSelected ? AppColors.primaryOrange : Colors.grey.shade400,
+            size: 20,
           ),
-        ];
-      },
-      child: _filterButton(
-        Icons.filter_list_rounded,
-        'Filter',
-        count: activeFilters.isEmpty ? null : activeFilters.length,
+          const SizedBox(width: 12),
+          Text(label, style: const TextStyle(fontSize: 14)),
+        ],
       ),
     );
   }
 
-  Widget _sortMenu(BuildContext context) {
-    return PopupMenuButton<CustomerSort>(
-      color: AppColors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      tooltip: 'Sort',
-      onSelected: onSortChanged,
-      itemBuilder: (context) {
-        return CustomerSort.values.map((sort) {
-          return CheckedPopupMenuItem<CustomerSort>(
-            value: sort,
-            checked: sort == sortBy,
-            child: Text(_sortLabel(sort)),
-          );
-        }).toList();
-      },
-      child: _filterButton(Icons.sort_rounded, 'Sort'),
+  PopupMenuItem<CustomerSort> _buildSortItem(CustomerSort sort, String label) {
+    final isSelected = sortBy == sort;
+    return PopupMenuItem(
+      value: sort,
+      child: Row(
+        children: [
+          Icon(
+            isSelected
+                ? Icons.radio_button_checked
+                : Icons.radio_button_unchecked,
+            color: isSelected ? AppColors.primaryOrange : Colors.grey.shade400,
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              color: isSelected ? AppColors.primaryOrange : Colors.black87,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _filterButton(IconData icon, String label, {int? count}) {
+  Widget _filterButton(IconData icon, String label, {bool isActive = false}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isActive
+            ? AppColors.primaryOrange.withOpacity(0.1)
+            : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(
+          color: isActive ? AppColors.primaryOrange : Colors.grey.shade200,
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: Colors.grey.shade600),
+          Icon(
+            icon,
+            size: 20,
+            color: isActive ? AppColors.primaryOrange : Colors.grey.shade600,
+          ),
           const SizedBox(width: 8),
           Text(
-            count == null ? label : '$label ($count)',
+            label,
             style: TextStyle(
-              color: Colors.grey.shade700,
+              color: isActive ? AppColors.primaryOrange : Colors.grey.shade700,
               fontWeight: FontWeight.w500,
               fontSize: 14,
             ),

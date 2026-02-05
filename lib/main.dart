@@ -1,4 +1,4 @@
-import 'package:dream_pos/layout/app_shell.dart';
+import 'package:dream_pos/screens/auth/auth_wrapper.dart';
 import 'package:dream_pos/screens/onBoarding/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Dreem POS',
-      home: const SplashScreen(nextScreen: AppShell()),
+      home: const SplashScreen(nextScreen: AuthWrapper()),
     );
   }
 }

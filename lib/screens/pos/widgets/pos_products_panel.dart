@@ -4,7 +4,7 @@ import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/screens/pos/widgets/category_filter.dart';
 import 'package:dream_pos/screens/pos/widgets/products_grid.dart';
 import 'package:dream_pos/screens/products/model/product.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';

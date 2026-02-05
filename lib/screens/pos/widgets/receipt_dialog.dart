@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:dream_pos/screens/pos/models/receipt_model.dart';
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/screens/pos/services/receipt_pdf_generator.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';

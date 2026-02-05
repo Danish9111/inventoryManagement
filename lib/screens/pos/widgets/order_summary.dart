@@ -1,5 +1,5 @@
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 
 /// Order Summary Widget showing subtotal, tax, discount, total

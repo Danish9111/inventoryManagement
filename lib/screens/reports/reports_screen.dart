@@ -1,7 +1,7 @@
 import 'package:dream_pos/screens/reports/providers/report_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 import 'data/sample_report_data.dart';
 import 'models/report_models.dart';
 import 'reports_responsive_helper.dart';

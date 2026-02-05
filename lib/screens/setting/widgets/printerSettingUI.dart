@@ -1,7 +1,7 @@
 import 'package:dream_pos/widgets/customDropDown.dart';
 import 'package:flutter/material.dart';
 
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 
 class PrinterSettingsUI extends StatefulWidget {
   const PrinterSettingsUI({super.key});
@@ -161,8 +161,6 @@ class _PrinterSettingsUIState extends State<PrinterSettingsUI> {
     );
   }
 
-
-
   // ───────────────── PAPER SIZE ─────────────────
 
   Widget _paperSizeSelector() {
@@ -290,7 +288,6 @@ class _PrinterSettingsUIState extends State<PrinterSettingsUI> {
       ),
     );
   }
-
 
   Widget _sectionTitle(String text) {
     return Text(

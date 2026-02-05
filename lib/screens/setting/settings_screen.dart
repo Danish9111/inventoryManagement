@@ -6,7 +6,7 @@ import 'package:dream_pos/screens/setting/widgets/receiptSettingsUI.dart';
 import 'package:dream_pos/screens/setting/widgets/security.dart';
 import 'package:flutter/material.dart';
 
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

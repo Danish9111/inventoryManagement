@@ -1,6 +1,6 @@
 import 'package:dream_pos/screens/dashboard/models/feature_model.dart';
 import 'package:dream_pos/screens/dashboard/responsive_helper.dart';
-import 'package:dream_pos/widgets/appColors.dart';
+import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 
 /// 🔹 Feature Card Widget - Fluid Responsive

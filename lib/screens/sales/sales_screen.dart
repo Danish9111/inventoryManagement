@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 import 'data/sample_sales_data.dart';
 import 'models/sale_model.dart';
 import 'sales_responsive_helper.dart';

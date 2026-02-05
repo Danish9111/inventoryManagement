@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../widgets/appColors.dart';
+import '../../../constants/appColors.dart';
 
 class ProductSection extends StatelessWidget {
   final String title;

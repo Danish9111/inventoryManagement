@@ -5,7 +5,7 @@ import 'package:dream_pos/screens/dashboard/widgets/feature_card.dart';
 import 'package:dream_pos/screens/dashboard/providers/feature_item_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../widgets/appColors.dart';
+import '../../constants/appColors.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   final void Function(int index)? onNavigate;
