@@ -325,6 +325,8 @@ class PosCartPanel extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        icon: const Icon(Icons.person_add_outlined),
+        backgroundColor: AppColors.white,
         title: const Text('Add Customer'),
         content: Column(
           mainAxisSize: MainAxisSize.min,

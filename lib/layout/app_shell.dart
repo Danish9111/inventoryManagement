@@ -1,15 +1,15 @@
 import 'package:dream_pos/screens/barcode/barcode_screen.dart';
+import 'package:dream_pos/screens/customers/customers_screen.dart';
+import 'package:dream_pos/screens/dashboard/dashboard_screen.dart';
 import 'package:dream_pos/screens/expenses/expensesListScreen/expenseListScreen.dart';
+import 'package:dream_pos/screens/pos/pos_screen.dart';
 import 'package:dream_pos/screens/products/ProductListScreen/productListScreen.dart';
 import 'package:dream_pos/screens/reports/reports_screen.dart';
 import 'package:dream_pos/screens/sales/sales_screen.dart';
+import 'package:dream_pos/screens/setting/settings_screen.dart';
+import 'package:dream_pos/widgets/side_bar.dart';
+import 'package:dream_pos/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
-
-import '../screens/dashboard/dashboard_screen.dart';
-import '../screens/pos/pos_screen.dart';
-import '../screens/setting/settings_screen.dart';
-import '../widgets/side_bar.dart';
-import '../widgets/top_app_bar.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -21,70 +21,43 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int selectedIndex = 0;
 
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-
-  void navigateTo(int index, Widget screen) {
+  void _navigateTo(int index) {
     setState(() => selectedIndex = index);
-
-    _navigatorKey.currentState!.pushReplacement(
-      MaterialPageRoute(builder: (_) => screen),
-    );
   }
+
+  List<Widget> get _screens => [
+    DashboardScreen(onNavigate: _navigateTo),
+    const PosScreen(),
+    const ProductListScreen(),
+    const SalesScreen(),
+    const CustomersScreen(),
+    const ReportsScreen(),
+    const BarcodeScreen(),
+    const ExpenseListScreen(),
+    const SettingsScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: TopAppBar(onNavigate: navigateTo),
+        child: TopAppBar(onNavigate: (index, _) => _navigateTo(index)),
       ),
-
       body: Row(
         children: [
           /// 👈 SIDEBAR (FIXED)
           SingleChildScrollView(
             child: SideBar(
               selectedIndex: selectedIndex,
-              onItemSelected: (index) {
-                switch (index) {
-                  case 0:
-                    navigateTo(0, const DashboardScreen());
-                    break;
-                  case 1:
-                    navigateTo(1, const PosScreen());
-                    break;
-                  case 2:
-                    navigateTo(2, const ProductListScreen());
-                    break;
-                  case 3:
-                    navigateTo(3, const SalesScreen());
-                    break;
-                  case 4:
-                    navigateTo(4, const ReportsScreen());
-                    break;
-                  case 5:
-                    navigateTo(5, const BarcodeScreen());
-                    break;
-                  case 6:
-                    navigateTo(6, const ExpenseListScreen());
-                    break;
-                  case 7:
-                    navigateTo(7, const SettingsScreen());
-                    break;
-                }
-              },
+              onItemSelected: _navigateTo,
             ),
           ),
 
-          /// 👉 MAIN CONTENT (CHANGES ONLY HERE)
+          /// 👉 MAIN CONTENT
           Expanded(
-            child: Navigator(
-              key: _navigatorKey,
-              onGenerateRoute: (_) =>
-                  MaterialPageRoute(builder: (_) => const DashboardScreen()),
-            ),
+            child: IndexedStack(index: selectedIndex, children: _screens),
           ),
         ],
       ),

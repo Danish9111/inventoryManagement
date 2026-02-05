@@ -73,55 +73,113 @@ class DateFilterWidget extends StatelessWidget {
   }
 }
 
-/// Export Button Widget
+/// Export Button Widget - Now with Dropdown Menu
 class ExportButton extends StatelessWidget {
   final String label;
   final IconData icon;
-  final VoidCallback onPressed;
   final ReportsResponsiveHelper responsive;
 
   const ExportButton({
     super.key,
     required this.label,
     required this.icon,
-    required this.onPressed,
     required this.responsive,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(responsive.dateFilterBorderRadius),
-        child: Container(
-          height: responsive.dateFilterHeight,
-          padding: EdgeInsets.symmetric(
-            horizontal: responsive.dateFilterPadding,
+    return PopupMenuButton<String>(
+      iconColor: Colors.white,
+      color: AppColors.white,
+      offset: const Offset(0, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 8,
+      onSelected: (value) {
+        // Handle export selection
+        debugPrint('Exporting as $value');
+      },
+      itemBuilder: (BuildContext context) => [
+        _menuItem(
+          value: 'pdf',
+          icon: Icons.picture_as_pdf_rounded,
+          text: 'Export as PDF',
+          color: const Color(0xFFEF4444),
+        ),
+        _menuItem(
+          value: 'excel',
+          icon: Icons.table_chart_rounded,
+          text: 'Export as Excel',
+          color: const Color(0xFF10B981),
+        ),
+        _menuItem(
+          value: 'share',
+          icon: Icons.share_rounded,
+          text: 'Share Report',
+          color: const Color(0xFF3B82F6),
+        ),
+      ],
+      child: Container(
+        height: responsive.dateFilterHeight,
+        padding: EdgeInsets.symmetric(horizontal: responsive.dateFilterPadding),
+        decoration: BoxDecoration(
+          color: AppColors.primaryBlue,
+          borderRadius: BorderRadius.circular(
+            responsive.dateFilterBorderRadius,
           ),
-          decoration: BoxDecoration(
-            color: AppColors.primaryBlue,
-            borderRadius: BorderRadius.circular(
-              responsive.dateFilterBorderRadius,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryBlue.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: responsive.scale(16, 20), color: Colors.white),
+            SizedBox(width: responsive.scale(6, 10)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: responsive.dateFilterFontSize,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: responsive.scale(4, 8)),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: responsive.scale(16, 20),
+              color: Colors.white.withOpacity(0.8),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  PopupMenuItem<String> _menuItem({
+    required String value,
+    required IconData icon,
+    required String text,
+    required Color color,
+  }) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 12),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1E293B),
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: responsive.scale(16, 20), color: Colors.white),
-              SizedBox(width: responsive.scale(6, 10)),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: responsive.dateFilterFontSize,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

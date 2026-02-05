@@ -65,7 +65,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
                     selectedDateFilter: _selectedDateFilter,
                     onDateChanged: (v) =>
                         setState(() => _selectedDateFilter = v),
-                    onExport: _showExportOptions,
                   ),
                   SizedBox(height: responsive.reportSectionSpacing),
 
@@ -88,15 +87,6 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen>
       ),
     );
   }
-
-  /// EXPORT BOTTOM SHEET
-  void _showExportOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const ExportBottomSheet(),
-    );
-  }
 }
 
 /* ───────────────────────── HEADER ───────────────────────── */
@@ -105,20 +95,16 @@ class ReportsHeader extends ConsumerWidget {
   final ReportsResponsiveHelper responsive;
   final DateFilterOption selectedDateFilter;
   final ValueChanged<DateFilterOption> onDateChanged;
-  final VoidCallback onExport;
 
   const ReportsHeader({
     super.key,
     required this.responsive,
     required this.selectedDateFilter,
     required this.onDateChanged,
-    required this.onExport,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reportsState = ref.watch(reportsProvider);
-
     final r = responsive;
 
     return r.useWideLayout
@@ -189,7 +175,6 @@ class ReportsHeader extends ConsumerWidget {
         ExportButton(
           label: 'Export',
           icon: Icons.download_rounded,
-          onPressed: onExport,
           responsive: r,
         ),
       ],
@@ -274,79 +259,6 @@ class ReportsChartsSection extends ConsumerWidget {
           responsive: responsive,
         ),
       ],
-    );
-  }
-}
-
-/* ───────────────────────── EXPORT SHEET ───────────────────────── */
-
-class ExportBottomSheet extends StatelessWidget {
-  const ExportBottomSheet({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Export Report',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-          _ExportOption(
-            icon: Icons.picture_as_pdf_rounded,
-            title: 'Export as PDF',
-            subtitle: 'Best for printing',
-            color: Color(0xFFEF4444),
-          ),
-          _ExportOption(
-            icon: Icons.table_chart_rounded,
-            title: 'Export as Excel',
-            subtitle: 'Best for analysis',
-            color: Color(0xFF10B981),
-          ),
-          _ExportOption(
-            icon: Icons.share_rounded,
-            title: 'Share Report',
-            subtitle: 'Send to others',
-            color: Color(0xFF3B82F6),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ExportOption extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final Color color;
-
-  const _ExportOption({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: Icon(icon, color: color),
-        title: Text(title),
-        subtitle: Text(subtitle),
-        onTap: () => Navigator.pop(context),
-      ),
     );
   }
 }

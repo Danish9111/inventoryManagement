@@ -8,7 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/appColors.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
-  const DashboardScreen({super.key});
+  final void Function(int index)? onNavigate;
+
+  const DashboardScreen({super.key, this.onNavigate});
 
   @override
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
@@ -41,6 +43,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 FeaturedCardSection(
                   featuresItem: featuresItem,
                   responsive: responsive,
+                  onNavigate: widget.onNavigate,
                 ),
 
                 SizedBox(height: responsive.sectionSpacing * 1.3),
@@ -166,17 +169,20 @@ class SummarySection extends StatelessWidget {
   }
 }
 
-class FeaturedCardSection extends ConsumerWidget {
+class FeaturedCardSection extends StatelessWidget {
   final ResponsiveHelper responsive;
   final List<FeatureItem> featuresItem;
+  final void Function(int index)? onNavigate;
+
   const FeaturedCardSection({
     super.key,
     required this.responsive,
     required this.featuresItem,
+    this.onNavigate,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -188,9 +194,13 @@ class FeaturedCardSection extends ConsumerWidget {
       ),
       itemCount: featuresItem.length,
       itemBuilder: (context, index) {
+        final feature = featuresItem[index];
         return FeatureCard(
-          feature: featuresItem[index],
+          feature: feature,
           responsive: responsive,
+          onTap: feature.sidebarIndex >= 0 && onNavigate != null
+              ? () => onNavigate!(feature.sidebarIndex)
+              : null,
         );
       },
     );

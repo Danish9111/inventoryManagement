@@ -9,6 +9,7 @@ class FeatureItem {
   final String subtitle;
   final Color iconColor;
   final Color bgColor;
+  final int sidebarIndex;
 
   FeatureItem({
     required this.icon,
@@ -16,5 +17,6 @@ class FeatureItem {
     required this.subtitle,
     required this.iconColor,
     required this.bgColor,
+    required this.sidebarIndex,
   });
 }

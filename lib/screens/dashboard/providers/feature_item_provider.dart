@@ -13,6 +13,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'Create a new sales order',
         iconColor: AppColors.salesOrange,
         bgColor: AppColors.salesOrangeLight,
+        sidebarIndex: 1, // POS Screen
       ),
       FeatureItem(
         icon: Icons.add_shopping_cart_rounded,
@@ -20,6 +21,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'Record new purchases',
         iconColor: AppColors.purchaseGreen,
         bgColor: AppColors.purchaseGreenLight,
+        sidebarIndex: -1, // No screen yet
       ),
       FeatureItem(
         icon: Icons.inventory_2_rounded,
@@ -27,6 +29,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'Manage your inventory',
         iconColor: AppColors.productsPurple,
         bgColor: AppColors.productsPurpleLight,
+        sidebarIndex: 2, // Products Screen
       ),
       FeatureItem(
         icon: Icons.analytics_rounded,
@@ -34,6 +37,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'View sales and analytics',
         iconColor: AppColors.reportsPink,
         bgColor: AppColors.reportsPinkLight,
+        sidebarIndex: 5, // Reports Screen (was 4)
       ),
       FeatureItem(
         icon: Icons.people_alt_rounded,
@@ -41,6 +45,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'Manage customer data',
         iconColor: AppColors.customersTeal,
         bgColor: AppColors.customersTealLight,
+        sidebarIndex: 4, // Customers Screen (NEW)
       ),
       FeatureItem(
         icon: Icons.receipt_long_rounded,
@@ -48,6 +53,7 @@ class FeatureItemNotifier extends Notifier<List<FeatureItem>> {
         subtitle: 'Track business expenses',
         iconColor: AppColors.expensesRed,
         bgColor: AppColors.expensesRedLight,
+        sidebarIndex: 7, // Expenses Screen (was 6)
       ),
     ];
   }

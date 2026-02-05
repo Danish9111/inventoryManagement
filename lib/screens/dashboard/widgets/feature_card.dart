@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class FeatureCard extends StatefulWidget {
   final FeatureItem feature;
   final ResponsiveHelper responsive;
+  final VoidCallback? onTap;
 
   const FeatureCard({
     super.key,
     required this.feature,
     required this.responsive,
+    this.onTap,
   });
 
   @override
@@ -39,7 +41,7 @@ class _FeatureCardState extends State<FeatureCard> {
             color: _isHovered
                 ? widget.feature.iconColor.withOpacity(0.3)
                 : AppColors.cardBorder,
-            width: _isHovered ? 2 : 1,
+            width: 1,
           ),
           boxShadow: [
             BoxShadow(
@@ -54,9 +56,7 @@ class _FeatureCardState extends State<FeatureCard> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
-              // TODO: Navigate to respective screens
-            },
+            onTap: widget.onTap,
             borderRadius: BorderRadius.circular(r.featureCardBorderRadius),
             child: Padding(
               padding: EdgeInsets.all(r.featureCardPadding),
