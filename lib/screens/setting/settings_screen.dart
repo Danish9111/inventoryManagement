@@ -68,13 +68,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 12),
 
                 /// MENU ITEMS
-                _sideItem(Icons.person_outline, 'Profile', 0),
-                _sideItem(Icons.print_outlined, 'Printer Settings', 1),
-                _sideItem(Icons.receipt_long_outlined, 'Receipt Settings', 2),
+                _sideItem(Icons.person_outline, 'Profile', 0, islogout: false),
+                _sideItem(
+                  Icons.print_outlined,
+                  'Printer Settings',
+                  1,
+                  islogout: false,
+                ),
+                _sideItem(
+                  Icons.receipt_long_outlined,
+                  'Receipt Settings',
+                  2,
+                  islogout: false,
+                ),
                 // _sideItem(Icons.storefront_outlined, 'Shop Details', 3),
-                _sideItem(Icons.security_outlined, 'Security', 3),
-                _sideItem(Icons.security_outlined, 'FAQs', 4),
-                _sideItem(Icons.info_outline, 'About App', 5),
+                _sideItem(
+                  Icons.security_outlined,
+                  'Security',
+                  3,
+                  islogout: false,
+                ),
+                _sideItem(Icons.security_outlined, 'FAQs', 4, islogout: false),
+                _sideItem(Icons.info_outline, 'About App', 5, islogout: false),
+                _sideItem(Icons.logout, 'Logout', 6, islogout: true),
               ],
             ),
           ),
@@ -91,7 +107,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _sideItem(IconData icon, String title, int index) {
+  Widget _sideItem(
+    IconData icon,
+    String title,
+    int index, {
+    bool islogout = false,
+  }) {
     final isActive = selectedIndex == index;
 
     return InkWell(
@@ -109,7 +130,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Icon(
               icon,
               size: 20,
-              color: isActive ? AppColors.primaryOrange : Colors.grey,
+              color: islogout
+                  ? Colors.red
+                  : isActive
+                  ? AppColors.primaryOrange
+                  : Colors.grey,
             ),
             const SizedBox(width: 12),
             Text(
@@ -117,7 +142,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? AppColors.primaryOrange : Colors.black87,
+                color: islogout
+                    ? Colors.red
+                    : isActive
+                    ? AppColors.primaryOrange
+                    : Colors.black87,
               ),
             ),
           ],

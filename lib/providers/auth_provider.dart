@@ -1,73 +1,63 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
-final authServiceProvider = Provider((ref) => AuthService());
+// Auth service provider
+final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final authService = ref.watch(authServiceProvider);
-  return AuthNotifier(authService);
-});
+class AuthNotifier extends AsyncNotifier<User?> {
+  late final AuthService _authService;
 
-abstract class AuthState {}
+  @override
+  Future<User?> build() async {
+    // Initialize AuthService
+    _authService = ref.read(authServiceProvider);
 
-class AuthInitial extends AuthState {}
+    // Check if user is already logged in
+    final token = await _authService.getToken();
+    if (token != null && token.isNotEmpty) {
+      // final user = await _authService.login(email, password);
+      return null;
+    }
 
-class AuthLoading extends AuthState {}
-
-class AuthSuccess extends AuthState {
-  final User user;
-  AuthSuccess(this.user);
-}
-
-class AuthError extends AuthState {
-  final String message;
-  AuthError(this.message);
-}
-
-class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthService _authService;
-
-  AuthNotifier(this._authService) : super(AuthInitial()) {
-    checkLoginStatus();
+    // No logged in user
+    return null;
   }
 
   Future<void> login(String email, String password) async {
+    // async state handling built-in
+    state = const AsyncLoading();
     try {
-      state = AuthLoading();
       final user = await _authService.login(email, password);
-      state = AuthSuccess(user);
+      state = AsyncData(user);
     } catch (e) {
-      state = AuthError(e.toString().replaceAll('Exception: ', ''));
+      state = AsyncError(
+        e.toString().replaceAll('Exception: ', ''),
+        StackTrace.current,
+      );
     }
   }
 
   Future<void> register(String name, String email, String password) async {
+    state = const AsyncLoading();
     try {
-      state = AuthLoading();
       final user = await _authService.register(name, email, password);
-      state = AuthSuccess(user);
+      state = AsyncData(user);
     } catch (e) {
-      state = AuthError(e.toString().replaceAll('Exception: ', ''));
+      state = AsyncError(
+        e.toString().replaceAll('Exception: ', ''),
+        StackTrace.current,
+      );
     }
   }
 
   Future<void> logout() async {
     await _authService.logout();
-    state = AuthInitial();
-  }
-
-  Future<void> checkLoginStatus() async {
-    final token = await _authService.getToken();
-    if (token != null && token.isNotEmpty) {
-      // In a real app, you might want to fetch the user profile here using the token
-      // For now, we will just assume valid session if token exists, or stay in Initial/Success with dummy user if needed,
-      // But ideally we need a 'getUserProfile' endpoint.
-      // putting state as Initial for now, logic to be refined.
-      // If we don't have user data, we can't really go to Success unless we fetch it.
-      // PROVISIONAL: We won't auto-login to Success state without fetching user data.
-      // So implementation often needs a /me endpoint.
-    }
+    state = const AsyncData(null);
   }
 }
+
+// Modern AsyncNotifier for auth
+final authProvider = AsyncNotifierProvider<AuthNotifier, User?>(
+  () => AuthNotifier(),
+);

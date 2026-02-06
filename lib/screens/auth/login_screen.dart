@@ -1,9 +1,9 @@
 import 'package:dream_pos/constants/appColors.dart';
 import 'package:dream_pos/constants/app_images.dart';
+import 'package:dream_pos/models/user_model.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Keep your existing imports
 import '../../providers/auth_provider.dart';
 import 'signup_screen.dart';
 import '../../layout/app_shell.dart';
@@ -30,9 +30,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _submit() async {
     if (_formKey.currentState!.validate()) {
-      // Dismiss keyboard on tablets to prevent UI jank
       FocusScope.of(context).unfocus();
-
       await ref
           .read(authProvider.notifier)
           .login(_emailController.text.trim(), _passwordController.text.trim());
@@ -44,16 +42,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (previous, next) {
-      if (next is AuthError) {
+      if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.message),
+            content: Text(next.error.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red.shade700,
-            behavior: SnackBarBehavior.floating, // Better for wide screens
-            width: 400, // Constrain width on tablets
+            behavior: SnackBarBehavior.floating,
+            width: 400,
           ),
         );
-      } else if (next is AuthSuccess) {
+      } else if (next.value != null) {
         Navigator.of(
           context,
         ).pushReplacement(MaterialPageRoute(builder: (_) => const AppShell()));
@@ -61,7 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Professional off-white background
+      backgroundColor: Colors.grey[50],
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isWideScreen = constraints.maxWidth > 900;
@@ -69,26 +67,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           if (isWideScreen) {
             return Row(
               children: [
-                // 1. Branding Side (Left Panel)
                 Expanded(
                   flex: 5,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // Background image
                       Image.asset(AppImages.backgroundImage, fit: BoxFit.cover),
-
-                      // Color overlay
                       Container(color: AppColors.primaryBlue.withOpacity(0.7)),
-
-                      // Content
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(AppImages.wlogo, height: 100),
                           const SizedBox(height: 20),
                           const Text(
-                            'Dream POS',
+                            'Dreem POS',
                             style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,
@@ -109,7 +101,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ],
                   ),
                 ),
-
                 Expanded(
                   flex: 4,
                   child: Center(
@@ -126,14 +117,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             );
           }
 
-          // Mobile / Tablet Portrait View
           return Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 450),
                 child: Card(
-                  elevation: 0, // Clean flat look or slight elevation
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -151,14 +141,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildLoginForm(AuthState authState) {
+  Widget _buildLoginForm(AsyncValue<User?> authState) {
     return Form(
       key: _formKey,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
           const Text(
             'Welcome Back',
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
@@ -192,7 +181,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
 
           const SizedBox(height: 12),
-          // Forgot Password (Standard in POS)
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -206,11 +194,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
           const SizedBox(height: 24),
 
-          // Action Button
           SizedBox(
-            height: 56, // Taller buttons are better for touch screens
+            height: 56,
             child: ElevatedButton(
-              onPressed: authState is AuthLoading ? null : _submit,
+              onPressed: authState.isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryOrange,
                 foregroundColor: AppColors.white,
@@ -219,7 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 elevation: 2,
               ),
-              child: authState is AuthLoading
+              child: authState.isLoading
                   ? const SizedBox(
                       height: 24,
                       width: 24,
@@ -240,7 +227,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
           const SizedBox(height: 24),
 
-          // Switch to Signup
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

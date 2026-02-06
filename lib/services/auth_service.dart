@@ -1,22 +1,24 @@
 import 'dart:convert';
+import 'package:dream_pos/constants/api_constants.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
 class AuthService {
-  // Using 10.0.2.2 for Android emulator localhost access.
-  // Change to your actual backend URL if running on a real device or hosted server.
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
-
   Future<User> login(String email, String password) async {
     try {
+      debugPrint(email);
+      debugPrint(password);
       final response = await http.post(
         Uri.parse(
-          '$baseUrl/users/login',
+          '${ApiConstants.baseUrl}${ApiConstants.login}',
         ), // Adjusted to common nodejs pattern based on typical structures
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'email': email, 'password': password}),
       );
+      debugPrint(response.body);
+      debugPrint(response.statusCode.toString());
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -55,11 +57,13 @@ class AuthService {
     try {
       final response = await http.post(
         Uri.parse(
-          '$baseUrl/users',
+          '${ApiConstants.baseUrl}${ApiConstants.register}',
         ), // Adjusted to strictly RESTful /users usually
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'name': name, 'email': email, 'password': password}),
       );
+      debugPrint(response.body);
+      debugPrint(response.statusCode.toString());
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = jsonDecode(response.body);

@@ -3,6 +3,7 @@ import 'package:dream_pos/constants/app_images.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import 'login_screen.dart';
 import '../../layout/app_shell.dart';
@@ -48,16 +49,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (previous, next) {
-      if (next is AuthError) {
+      if (next.hasError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.message),
+            content: Text(next.error.toString().replaceAll('Exception: ', '')),
             backgroundColor: Colors.red.shade700,
             behavior: SnackBarBehavior.floating,
             width: 400,
           ),
         );
-      } else if (next is AuthSuccess) {
+      } else if (next.value != null) {
         Navigator.of(
           context,
         ).pushReplacement(MaterialPageRoute(builder: (_) => const AppShell()));
@@ -92,7 +93,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           Image.asset(AppImages.wlogo, height: 100),
                           const SizedBox(height: 20),
                           const Text(
-                            'Dream POS',
+                            'Dreem POS',
                             style: TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,
@@ -155,7 +156,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
-  Widget _buildSignupForm(AuthState authState) {
+  Widget _buildSignupForm(AsyncValue<User?> authState) {
     return Form(
       key: _formKey,
       child: Column(
@@ -208,7 +209,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           SizedBox(
             height: 56,
             child: ElevatedButton(
-              onPressed: authState is AuthLoading ? null : _submit,
+              onPressed: authState.isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryOrange,
                 foregroundColor: AppColors.white,
@@ -217,7 +218,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
                 elevation: 2,
               ),
-              child: authState is AuthLoading
+              child: authState.isLoading
                   ? const SizedBox(
                       height: 24,
                       width: 24,

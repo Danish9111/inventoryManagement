@@ -11,13 +11,16 @@ class AuthWrapper extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    // In a real app, you might want to handle 'AuthChecking' state with a loading spinner
-    // specifically if the check takes time. Here we assume fast check or default to Login.
-
-    if (authState is AuthSuccess) {
-      return const AppShell();
-    }
-
-    return const LoginScreen();
+    return authState.when(
+      data: (user) {
+        if (user != null) {
+          return const AppShell();
+        }
+        return const LoginScreen();
+      },
+      error: (err, stack) => const LoginScreen(),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+    );
   }
 }
