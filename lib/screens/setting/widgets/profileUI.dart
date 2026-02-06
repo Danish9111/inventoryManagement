@@ -2,13 +2,53 @@ import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 
+import 'package:dream_pos/providers/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../widgets/customButtons.dart';
 
-class ProfileUI extends StatelessWidget {
+class ProfileUI extends ConsumerStatefulWidget {
   const ProfileUI({super.key});
 
   @override
+  ConsumerState<ProfileUI> createState() => _ProfileUIState();
+}
+
+class _ProfileUIState extends ConsumerState<ProfileUI> {
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    final user = ref.read(authProvider).value;
+    _nameController = TextEditingController(text: user?.name ?? '');
+    _emailController = TextEditingController(text: user?.email ?? '');
+    // Phone is not in user model yet, leaving empty or placeholder
+    _phoneController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Listen to user changes if needed, or just use initial value
+    final user = ref.watch(authProvider).value;
+
+    // Update controllers if user changes (e.g. after edit)
+    if (user != null && _nameController.text != user.name) {
+      _nameController.text = user.name;
+    }
+    if (user != null && _emailController.text != user.email) {
+      _emailController.text = user.email;
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
@@ -35,7 +75,7 @@ class ProfileUI extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// PROFILE IMAGE
-                  _avatarSection(),
+                  _avatarSection(user?.name ?? 'User'),
 
                   const SizedBox(height: 40),
 
@@ -43,52 +83,27 @@ class ProfileUI extends StatelessWidget {
                   _sectionTitle('Basic Information'),
                   const SizedBox(height: 20),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ProductTextField(
-                          label: 'First Name',
-                          controller: TextEditingController(),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ProductTextField(
-                          label: 'Last Name',
-                          controller: TextEditingController(),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                    ],
+                  // Merged Name Field
+                  ProductTextField(
+                    label: 'Name',
+                    controller: _nameController,
+                    keyboardType: TextInputType.text,
                   ),
 
                   const SizedBox(height: 18),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ProductTextField(
-                          label: 'Username',
-                          controller: TextEditingController(),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ProductTextField(
-                          label: 'Email',
-                          controller: TextEditingController(),
-                          keyboardType: TextInputType.text,
-                        ),
-                      ),
-                    ],
+
+                  // Email Field (Removed Username)
+                  ProductTextField(
+                    label: 'Email',
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
                   ),
 
                   const SizedBox(height: 18),
                   ProductTextField(
                     label: 'Phone Number',
-                    controller: TextEditingController(),
-                    keyboardType: TextInputType.text,
+                    controller: _phoneController,
+                    keyboardType: TextInputType.phone,
                   ),
 
                   const SizedBox(height: 48),
@@ -144,7 +159,7 @@ class ProfileUI extends StatelessWidget {
 
   // ───────────────── AVATAR ─────────────────
 
-  Widget _avatarSection() {
+  Widget _avatarSection(String userName) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -183,9 +198,12 @@ class ProfileUI extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Profile photo',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                Text(
+                  userName,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(

@@ -1,13 +1,11 @@
 import 'package:dream_pos/screens/pos/cart_provider.dart';
 import 'package:dream_pos/screens/pos/models/receipt_model.dart';
-import 'package:dream_pos/screens/pos/pos_provider.dart';
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/screens/pos/widgets/discount_dialog.dart';
 import 'package:dream_pos/screens/pos/widgets/payment_dialog.dart';
 import 'package:dream_pos/screens/pos/widgets/pos_cart_panel.dart';
 import 'package:dream_pos/screens/pos/widgets/pos_products_panel.dart';
 import 'package:dream_pos/screens/pos/widgets/receipt_dialog.dart';
-import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/screens/products/providers/product_provider.dart';
 import 'package:dream_pos/screens/sales/models/sale_model.dart';
 import 'package:dream_pos/screens/sales/providers/sales_provider.dart';
@@ -27,46 +25,66 @@ class _PosScreenState extends ConsumerState<PosScreen> {
   // Use a fixed tax rate or get from settings provider
   static const double _taxRate = 5.0;
 
-  void _handleBarcodeScanned(String barcode) {
+  Future<void> _handleBarcodeScanned(String barcode) async {
     if (barcode.isEmpty) return;
 
-    final products = ref.read(productProvider);
     final cartNotifier = ref.read(cartProvider.notifier);
+    final productNotifier = ref.read(productProvider.notifier);
 
-    final product = products.firstWhere(
-      (p) => p.barcode == barcode,
-      orElse: () => Product.empty(),
-    );
+    // Try to find product by barcode via API
+    try {
+      final product = await productNotifier.getByBarcode(barcode);
 
-    if (product.id.isNotEmpty) {
-      cartNotifier.addToCart(product);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: Colors.white),
-              const SizedBox(width: 8),
-              Text('Added: ${product.name}'),
-            ],
+      if (product != null && product.id.isNotEmpty) {
+        cartNotifier.addToCart(product);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Added: ${product.name}'),
+                ],
+              ),
+              backgroundColor: AppColors.purchaseGreen,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Product not found: $barcode'),
+                ],
+              ),
+              backgroundColor: AppColors.expensesRed,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error: ${e.toString()}')),
+              ],
+            ),
+            backgroundColor: AppColors.expensesRed,
+            duration: const Duration(seconds: 3),
           ),
-          backgroundColor: AppColors.purchaseGreen,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline, color: Colors.white),
-              const SizedBox(width: 8),
-              Text('Product not found: $barcode'),
-            ],
-          ),
-          backgroundColor: AppColors.expensesRed,
-          duration: const Duration(seconds: 3),
-        ),
-      );
+        );
+      }
     }
   }
 

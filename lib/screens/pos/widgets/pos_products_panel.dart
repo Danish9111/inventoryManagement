@@ -1,9 +1,8 @@
 import 'package:dream_pos/screens/pos/cart_provider.dart';
-import 'package:dream_pos/screens/pos/pos_provider.dart';
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/screens/pos/widgets/category_filter.dart';
 import 'package:dream_pos/screens/pos/widgets/products_grid.dart';
-import 'package:dream_pos/screens/products/model/product.dart';
+import 'package:dream_pos/screens/products/providers/product_provider.dart';
 import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,18 +20,21 @@ class PosProductsPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final posState = ref.watch(posProvider);
-    final posNotifier = ref.read(posProvider.notifier);
+    final filterState = ref.watch(posFilterProvider);
+    final filterNotifier = ref.read(posFilterProvider.notifier);
     final cartNotifier = ref.read(cartProvider.notifier);
 
-    // Efficiently watch cart items only for quantity updates if needed
+    // Cart quantities for showing counts on product cards
     final cartState = ref.watch(cartProvider);
-
     Map<String, int> cartQuantities = {
       for (var item in cartState.cartItems) item.product.id: item.quantity,
     };
 
-    final filteredProducts = ref.watch(filteredProductsProvider);
+    // Watch filtered products (now AsyncValue)
+    final filteredProductsAsync = ref.watch(filteredProductsProvider);
+
+    // Watch categories from API
+    final categoriesAsync = ref.watch(categoriesProvider);
 
     return Container(
       padding: EdgeInsets.all(responsive.panelPadding),
@@ -40,31 +42,91 @@ class PosProductsPanel extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with Welcome & Search
-          _buildProductsHeader(ref, responsive, posState.searchQuery),
+          _buildProductsHeader(ref, responsive, filterState.searchQuery),
 
           SizedBox(height: responsive.sectionSpacing),
 
-          // Category Filters
-          CategoryFilter(
-            categories: Product.categories,
-            selectedCategory: posState.selectedCategory,
-            showFeaturedOnly: posState.showFeaturedOnly,
-            onCategorySelected: (cat) => posNotifier.setCategory(cat),
-            onFeaturedToggle: (val) => posNotifier.toggleFeatured(val),
-            responsive: responsive,
+          // Category Filters (from API)
+          categoriesAsync.when(
+            data: (categories) => CategoryFilter(
+              categories: categories,
+              selectedCategory: filterState.category,
+              showFeaturedOnly: filterState.showFeaturedOnly,
+              onCategorySelected: (cat) => filterNotifier.setCategory(cat),
+              onFeaturedToggle: (val) => filterNotifier.toggleFeatured(val),
+              responsive: responsive,
+            ),
+            loading: () => const SizedBox(
+              height: 40,
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            ),
+            error: (_, __) => CategoryFilter(
+              categories: const ['All'],
+              selectedCategory: filterState.category,
+              showFeaturedOnly: filterState.showFeaturedOnly,
+              onCategorySelected: (cat) => filterNotifier.setCategory(cat),
+              onFeaturedToggle: (val) => filterNotifier.toggleFeatured(val),
+              responsive: responsive,
+            ),
           ),
 
           SizedBox(height: responsive.sectionSpacing),
 
-          // Products Grid
+          // Products Grid (handles loading/error/data states)
           Expanded(
-            child: ProductsGrid(
-              products: filteredProducts,
-              cartQuantities: cartQuantities,
-              onAddToCart: cartNotifier.addToCart,
-              onDecrement: cartNotifier.decrement,
-              onRemove: cartNotifier.remove,
-              responsive: responsive,
+            child: filteredProductsAsync.when(
+              data: (products) => ProductsGrid(
+                products: products,
+                cartQuantities: cartQuantities,
+                onAddToCart: cartNotifier.addToCart,
+                onDecrement: cartNotifier.decrement,
+                onRemove: cartNotifier.remove,
+                responsive: responsive,
+              ),
+              loading: () => const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Loading products...'),
+                  ],
+                ),
+              ),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: AppColors.expensesRed,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Failed to load products',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textGrey,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      error.toString(),
+                      style: TextStyle(fontSize: 12, color: AppColors.textGrey),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () =>
+                          ref.read(productProvider.notifier).refresh(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -114,7 +176,7 @@ class PosProductsPanel extends ConsumerWidget {
             height: r.searchHeight,
             child: TextField(
               onChanged: (value) =>
-                  ref.read(posProvider.notifier).setSearchQuery(value),
+                  ref.read(posFilterProvider.notifier).setSearchQuery(value),
               decoration: InputDecoration(
                 hintText: 'Search Product',
                 hintStyle: TextStyle(

@@ -16,8 +16,7 @@ class AuthNotifier extends AsyncNotifier<User?> {
     // Check if user is already logged in
     final token = await _authService.getToken();
     if (token != null && token.isNotEmpty) {
-      // final user = await _authService.login(email, password);
-      return null;
+      return User(id: '', name: '', email: '', token: token);
     }
 
     // No logged in user

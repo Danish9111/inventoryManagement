@@ -36,9 +36,12 @@ router.post("/register", async (req, res) => {
 
         if (user) {
             res.status(201).json({
+                success: true,
                 _id: user.id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                isAdmin: user.role === "admin",
                 token: generateToken(user._id),
                 message: "User created successfully"
             });
@@ -57,9 +60,12 @@ router.post("/login", async (req, res) => {
 
         if (user && (await bcrypt.compare(password, user.password))) {
             res.json({
+                success: true,
                 _id: user.id,
                 name: user.name,
                 email: user.email,
+                role: user.role,
+                isAdmin: user.role === "admin",
                 token: generateToken(user._id),
                 message: "Login successful"
             });

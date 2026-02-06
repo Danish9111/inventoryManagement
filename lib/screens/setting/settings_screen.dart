@@ -8,14 +8,18 @@ import 'package:flutter/material.dart';
 
 import '../../constants/appColors.dart';
 
-class SettingsScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/auth_provider.dart';
+import '../../widgets/custom_snackbar.dart';
+
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   int selectedIndex = 0;
 
   @override
@@ -115,43 +119,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }) {
     final isActive = selectedIndex == index;
 
-    return InkWell(
-      onTap: () => setState(() => selectedIndex = index),
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 6),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        decoration: BoxDecoration(
-          color: isActive ? const Color(0xFFF1F5FF) : null,
+    return Consumer(
+      builder: (context, ref, _) {
+        return InkWell(
+          onTap: () async {
+            if (islogout) {
+              try {
+                await ref.read(authProvider.notifier).logout();
+              } catch (e) {
+                if (context.mounted) {
+                  CustomSnackBar.show(
+                    context,
+                    message: 'Logout failed: $e',
+                    isError: true,
+                  );
+                }
+              }
+            } else {
+              setState(() => selectedIndex = index);
+            }
+          },
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: islogout
-                  ? Colors.red
-                  : isActive
-                  ? AppColors.primaryOrange
-                  : Colors.grey,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: isActive ? const Color(0xFFF1F5FF) : null,
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: islogout
-                    ? Colors.red
-                    : isActive
-                    ? AppColors.primaryOrange
-                    : Colors.black87,
-              ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 20,
+                  color: islogout
+                      ? Colors.red
+                      : isActive
+                      ? AppColors.primaryOrange
+                      : Colors.grey,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    color: islogout
+                        ? Colors.red
+                        : isActive
+                        ? AppColors.primaryOrange
+                        : Colors.black87,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

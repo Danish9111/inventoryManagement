@@ -1,3 +1,4 @@
+import 'package:dream_pos/constants/app_images.dart';
 import 'package:dream_pos/screens/pos/pos_responsive_helper.dart';
 import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
@@ -88,10 +89,9 @@ class ProductCard extends StatelessWidget {
                             },
                             errorBuilder: (_, __, ___) => Container(
                               color: AppColors.backgroundGrey,
-                              child: Icon(
-                                Icons.image_outlined,
-                                size: r.scale(24, 32),
-                                color: AppColors.textGrey.withOpacity(0.5),
+                              child: Image.asset(
+                                AppImages.blogo,
+                                fit: BoxFit.contain,
                               ),
                             ),
                           ),

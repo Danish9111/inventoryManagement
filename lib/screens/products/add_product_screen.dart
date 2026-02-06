@@ -81,58 +81,35 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       return;
     }
 
+    final newProduct = Product(
+      id:
+          widget.product?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      name: controller.productName.text,
+      description: controller.description.text,
+      slug: controller.slug.text,
+      sku: controller.sku.text,
+      sellingType: controller.sellingTypeId!,
+      category: controller.categoryId!,
+      subCategory: controller.subCategory.text,
+      brand: controller.brandId!,
+      unit: controller.unitId!,
+      quantity: int.parse(controller.quantity.text),
+      price: double.parse(controller.price.text),
+      salePrice: double.tryParse(controller.salePrice.text) ?? 0,
+      quantityAlert: int.parse(controller.quantityAlert.text),
+      expiryDate: controller.expiryDate,
+      hasWarranty: controller.hasWarranty,
+      images: List.from(controller.images),
+    );
+
     // ✏️ EDIT PRODUCT
     if (widget.product != null) {
-      ref
-          .read(productProvider.notifier)
-          .updateProduct(
-            Product(
-              id: widget.product!.id,
-              // 👈 KEEP SAME ID
-              name: controller.productName.text,
-              description: controller.description.text,
-              slug: controller.slug.text,
-              sku: controller.sku.text,
-              sellingType: controller.sellingTypeId!,
-              category: controller.categoryId!,
-              subCategory: controller.subCategory.text,
-              brand: controller.brandId!,
-              unit: controller.unitId!,
-              quantity: int.parse(controller.quantity.text),
-              price: double.parse(controller.price.text),
-              salePrice: double.tryParse(controller.salePrice.text) ?? 0,
-              quantityAlert: int.parse(controller.quantityAlert.text),
-              expiryDate: controller.expiryDate,
-              hasWarranty: controller.hasWarranty,
-              images: List.from(controller.images),
-            ),
-          );
+      ref.read(productProvider.notifier).updateProductLocally(newProduct);
     }
     // ➕ ADD PRODUCT
     else {
-      ref
-          .read(productProvider.notifier)
-          .addProduct(
-            Product(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              name: controller.productName.text,
-              description: controller.description.text,
-              slug: controller.slug.text,
-              sku: controller.sku.text,
-              sellingType: controller.sellingTypeId!,
-              category: controller.categoryId!,
-              subCategory: controller.subCategory.text,
-              brand: controller.brandId!,
-              unit: controller.unitId!,
-              quantity: int.parse(controller.quantity.text),
-              price: double.parse(controller.price.text),
-              salePrice: double.tryParse(controller.salePrice.text) ?? 0,
-              quantityAlert: int.parse(controller.quantityAlert.text),
-              expiryDate: controller.expiryDate,
-              hasWarranty: controller.hasWarranty,
-              images: List.from(controller.images),
-            ),
-          );
+      ref.read(productProvider.notifier).addProductLocally(newProduct);
     }
 
     Navigator.pop(context, true);

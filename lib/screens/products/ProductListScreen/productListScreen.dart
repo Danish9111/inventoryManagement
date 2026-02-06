@@ -25,25 +25,7 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final products = ref.watch(productProvider);
-
-    final categories = products.map((p) => p.category).toSet().toList();
-    final brands = products.map((p) => p.brand).toSet().toList();
-
-    List<Product> filteredProducts = products.where((product) {
-      final matchesSearch =
-          searchQuery.isEmpty ||
-          product.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          product.sku.toLowerCase().contains(searchQuery.toLowerCase());
-
-      final matchesCategory =
-          selectedCategory == null || product.category == selectedCategory;
-
-      final matchesBrand =
-          selectedBrand == null || product.brand == selectedBrand;
-
-      return matchesSearch && matchesCategory && matchesBrand;
-    }).toList();
+    final productsAsync = ref.watch(productProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
@@ -52,52 +34,113 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Header(onRefresh: () => setState(() {})),
-            const SizedBox(height: 16),
-            Filters(
-              categories: categories,
-              brands: brands,
-              selectedCategory: selectedCategory,
-              selectedBrand: selectedBrand,
-              onSearch: (value) {
-                setState(() => searchQuery = value);
-              },
-              onCategoryChanged: (value) {
-                setState(() => selectedCategory = value);
-              },
-              onBrandChanged: (value) {
-                setState(() => selectedBrand = value);
-              },
+            Header(
+              onRefresh: () => ref.read(productProvider.notifier).refresh(),
             ),
-            const SizedBox(height: 12),
-            TableHeader(),
+            const SizedBox(height: 16),
+
+            // Handle async state for products
             Expanded(
-              child: ListView.builder(
-                itemCount: filteredProducts.length,
-                itemBuilder: (_, index) {
-                  final product = filteredProducts[index];
+              child: productsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(height: 16),
+                      Text('Failed to load products: $error'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () =>
+                            ref.read(productProvider.notifier).refresh(),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (products) {
+                  final categories = products
+                      .map((p) => p.category)
+                      .toSet()
+                      .toList();
+                  final brands = products.map((p) => p.brand).toSet().toList();
 
-                  return ProductTableRow(
-                    product: product,
+                  List<Product> filteredProducts = products.where((product) {
+                    final matchesSearch =
+                        searchQuery.isEmpty ||
+                        product.name.toLowerCase().contains(
+                          searchQuery.toLowerCase(),
+                        ) ||
+                        product.sku.toLowerCase().contains(
+                          searchQuery.toLowerCase(),
+                        );
 
-                    /// 🗑 DELETE
-                    onDelete: () {
-                      ref
-                          .read(productProvider.notifier)
-                          .deleteProduct(product.id);
-                    },
+                    final matchesCategory =
+                        selectedCategory == null ||
+                        product.category == selectedCategory;
 
-                    /// ✏️ EDIT
-                    onEdit: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddProductScreen(
-                            product: product, // pass existing product
-                          ),
+                    final matchesBrand =
+                        selectedBrand == null || product.brand == selectedBrand;
+
+                    return matchesSearch && matchesCategory && matchesBrand;
+                  }).toList();
+
+                  return Column(
+                    children: [
+                      Filters(
+                        categories: categories,
+                        brands: brands,
+                        selectedCategory: selectedCategory,
+                        selectedBrand: selectedBrand,
+                        onSearch: (value) {
+                          setState(() => searchQuery = value);
+                        },
+                        onCategoryChanged: (value) {
+                          setState(() => selectedCategory = value);
+                        },
+                        onBrandChanged: (value) {
+                          setState(() => selectedBrand = value);
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      TableHeader(),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: filteredProducts.length,
+                          itemBuilder: (_, index) {
+                            final product = filteredProducts[index];
+
+                            return ProductTableRow(
+                              product: product,
+
+                              /// 🗑 DELETE
+                              onDelete: () {
+                                ref
+                                    .read(productProvider.notifier)
+                                    .removeProductLocally(product.id);
+                              },
+
+                              /// ✏️ EDIT
+                              onEdit: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AddProductScreen(
+                                      product: product, // pass existing product
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   );
                 },
               ),

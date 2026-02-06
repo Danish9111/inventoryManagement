@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:dream_pos/screens/products/data/productsData.dart';
-
 class Product {
   // 🔑 Identification
   final String id;
@@ -55,7 +53,6 @@ class Product {
     this.description,
     this.hasWarranty = false,
     this.expiryDate,
-
     this.isFeatured = false,
     this.barcode,
   });
@@ -76,9 +73,101 @@ class Product {
     images: [],
   );
 
-  // Get unique categories
-  static List<String> get categories {
-    final cats = productsList.map((p) => p.category).toSet().toList();
-    return ['All', ...cats];
+  /// Create Product from JSON (API response)
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      sku: json['sku'] ?? '',
+      sellingType: json['sellingType'] ?? 'Both',
+      category: json['category'] ?? '',
+      subCategory: json['subCategory'] ?? '',
+      brand: json['brand'] ?? '',
+      unit: json['unit'] ?? 'Pc',
+      quantity: (json['quantity'] ?? 0).toInt(),
+      price: (json['price'] ?? 0).toDouble(),
+      salePrice: json['salePrice'] != null
+          ? (json['salePrice']).toDouble()
+          : null,
+      quantityAlert: (json['quantityAlert'] ?? 10).toInt(),
+      description: json['description'],
+      images: List<String>.from(json['images'] ?? []),
+      barcode: json['barcode'],
+      isFeatured: json['isFeatured'] ?? false,
+      hasWarranty: json['hasWarranty'] ?? false,
+      expiryDate: json['expiryDate'] != null
+          ? DateTime.tryParse(json['expiryDate'])
+          : null,
+    );
+  }
+
+  /// Convert Product to JSON (for API requests)
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'slug': slug,
+      'sku': sku,
+      'sellingType': sellingType,
+      'category': category,
+      'subCategory': subCategory,
+      'brand': brand,
+      'unit': unit,
+      'quantity': quantity,
+      'price': price,
+      if (salePrice != null) 'salePrice': salePrice,
+      'quantityAlert': quantityAlert,
+      if (description != null) 'description': description,
+      'images': images,
+      if (barcode != null) 'barcode': barcode,
+      'isFeatured': isFeatured,
+      'hasWarranty': hasWarranty,
+      if (expiryDate != null) 'expiryDate': expiryDate!.toIso8601String(),
+    };
+  }
+
+  /// CopyWith for immutable updates
+  Product copyWith({
+    String? id,
+    String? name,
+    String? slug,
+    String? sku,
+    String? sellingType,
+    String? category,
+    String? subCategory,
+    String? brand,
+    String? unit,
+    int? quantity,
+    double? price,
+    double? salePrice,
+    int? quantityAlert,
+    String? description,
+    List<String>? images,
+    String? barcode,
+    bool? isFeatured,
+    bool? hasWarranty,
+    DateTime? expiryDate,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      slug: slug ?? this.slug,
+      sku: sku ?? this.sku,
+      sellingType: sellingType ?? this.sellingType,
+      category: category ?? this.category,
+      subCategory: subCategory ?? this.subCategory,
+      brand: brand ?? this.brand,
+      unit: unit ?? this.unit,
+      quantity: quantity ?? this.quantity,
+      price: price ?? this.price,
+      salePrice: salePrice ?? this.salePrice,
+      quantityAlert: quantityAlert ?? this.quantityAlert,
+      description: description ?? this.description,
+      images: images ?? this.images,
+      barcode: barcode ?? this.barcode,
+      isFeatured: isFeatured ?? this.isFeatured,
+      hasWarranty: hasWarranty ?? this.hasWarranty,
+      expiryDate: expiryDate ?? this.expiryDate,
+    );
   }
 }
