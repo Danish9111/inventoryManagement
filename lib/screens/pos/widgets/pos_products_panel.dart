@@ -30,10 +30,8 @@ class PosProductsPanel extends ConsumerWidget {
       for (var item in cartState.cartItems) item.product.id: item.quantity,
     };
 
-    // Watch filtered products (now AsyncValue)
     final filteredProductsAsync = ref.watch(filteredProductsProvider);
 
-    // Watch categories from API
     final categoriesAsync = ref.watch(categoriesProvider);
 
     return Container(
@@ -234,7 +232,7 @@ class PosProductsPanel extends ConsumerWidget {
             borderRadius: BorderRadius.circular(r.scale(10, 14)),
           ),
           child: IconButton(
-            onPressed: () => ref.watch(productProvider.notifier).refresh(),
+            onPressed: () => ref.read(productProvider.notifier).refresh(),
             icon: Icon(
               Icons.refresh,
               color: Colors.white,

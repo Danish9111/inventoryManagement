@@ -27,12 +27,17 @@ class ProductNotifier extends AsyncNotifier<List<Product>> {
     String? search,
     bool? featured,
   }) async {
-    final service = ref.read(productServiceProvider);
-    return await service.getProducts(
-      category: category,
-      search: search,
-      featured: featured,
-    );
+    try {
+      final service = ref.read(productServiceProvider);
+      final products = await service.getProducts(
+        category: category,
+        search: search,
+        featured: featured,
+      );
+      return products;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   /// Get auth token or throw
@@ -102,33 +107,22 @@ class ProductNotifier extends AsyncNotifier<List<Product>> {
   }
 
   /// Delete product via API
-  Future<void> deleteProduct(String id) async {
-    final token = await _requireAuth();
+  Future<void> deleteProduct(String id, String token) async {
     final service = ref.read(productServiceProvider);
-    await service.deleteProduct(id, token);
-
-    // Update local state immediately
-    final currentProducts = state.hasValue ? state.value! : <Product>[];
-    state = AsyncData(currentProducts.where((p) => p.id != id).toList());
+    final previous = state.value ?? [];
+    try {
+      service.deleteProduct(id, token);
+      final success = await service.deleteProduct(id, token);
+      if (!success) {
+        state = AsyncData(previous);
+      }
+    } catch (e) {
+      state = AsyncData(previous);
+    }
+    state = await AsyncValue.guard(() => _fetchProducts());
   }
 
   // ============ LOCAL-ONLY METHODS ============
-
-  /// Add product locally (without API - for optimistic updates)
-  void addProductLocally(Product product) {
-    state.whenData((products) {
-      state = AsyncData([...products, product]);
-    });
-  }
-
-  /// Update product locally (without API - for optimistic updates)
-  void updateProductLocally(Product product) {
-    state.whenData((products) {
-      state = AsyncData(
-        products.map((p) => p.id == product.id ? product : p).toList(),
-      );
-    });
-  }
 
   /// Remove product locally (without API - for optimistic updates)
   void removeProductLocally(String id) {
@@ -149,33 +143,75 @@ final categoriesProvider = FutureProvider<List<String>>((ref) async {
   return await service.getCategories();
 });
 
-/// Filtered products provider for POS screen
-/// Filters the loaded products client-side for quick filtering
-final filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
-  final productsAsync = ref.watch(productProvider);
-  final posState = ref.watch(posFilterProvider);
+/// Filters the loaded products client-side for quick filtering.
+///
+/// Uses a Notifier with ref.listen() to properly detect state changes from
+/// productProvider, including the AsyncLoading transition during refresh.
+final filteredProductsProvider =
+    NotifierProvider<FilteredProductsNotifier, AsyncValue<List<Product>>>(
+      FilteredProductsNotifier.new,
+    );
 
-  return productsAsync.whenData((products) {
-    return products.where((product) {
-      // Category filter
-      if (posState.category != 'All' && product.category != posState.category) {
-        return false;
-      }
-      // Featured filter
-      if (posState.showFeaturedOnly && !product.isFeatured) {
-        return false;
-      }
-      // Search filter
-      if (posState.searchQuery.isNotEmpty) {
-        final query = posState.searchQuery.toLowerCase();
-        return product.name.toLowerCase().contains(query) ||
-            product.category.toLowerCase().contains(query) ||
-            (product.barcode?.contains(query) ?? false);
-      }
-      return true;
-    }).toList();
-  });
-});
+class FilteredProductsNotifier extends Notifier<AsyncValue<List<Product>>> {
+  @override
+  AsyncValue<List<Product>> build() {
+    // Listen to productProvider changes
+    ref.listen(productProvider, (previous, next) {
+      _updateFilteredProducts();
+    });
+
+    // Listen to filter changes
+    ref.listen(posFilterProvider, (previous, next) {
+      _updateFilteredProducts();
+    });
+
+    // Initial computation
+    return _computeFiltered();
+  }
+
+  void _updateFilteredProducts() {
+    state = _computeFiltered();
+  }
+
+  AsyncValue<List<Product>> _computeFiltered() {
+    final productsAsync = ref.read(productProvider);
+    final posState = ref.read(posFilterProvider);
+
+    // Check isLoading first to properly handle refresh state
+    if (productsAsync.isLoading) {
+      return const AsyncLoading();
+    }
+
+    if (productsAsync.hasError) {
+      return AsyncError(productsAsync.error!, productsAsync.stackTrace!);
+    }
+
+    if (productsAsync.hasValue) {
+      final filtered = productsAsync.value!.where((product) {
+        // Category filter
+        if (posState.category != 'All' &&
+            product.category != posState.category) {
+          return false;
+        }
+        // Featured filter
+        if (posState.showFeaturedOnly && !product.isFeatured) {
+          return false;
+        }
+        // Search filter
+        if (posState.searchQuery.isNotEmpty) {
+          final query = posState.searchQuery.toLowerCase();
+          return product.name.toLowerCase().contains(query) ||
+              product.category.toLowerCase().contains(query) ||
+              (product.barcode?.contains(query) ?? false);
+        }
+        return true;
+      }).toList();
+      return AsyncData(filtered);
+    }
+
+    return const AsyncLoading();
+  }
+}
 
 /// POS filter state (for client-side filtering)
 class PosFilterState {

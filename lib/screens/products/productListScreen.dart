@@ -1,9 +1,11 @@
+import 'package:dream_pos/providers/auth_provider.dart';
 import 'package:dream_pos/screens/products/ProductListScreen/productListFilters.dart';
 import 'package:dream_pos/screens/products/ProductListScreen/productListHeader.dart';
 import 'package:dream_pos/screens/products/ProductListScreen/productTableHeader.dart';
 
 import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/screens/products/providers/product_provider.dart';
+import 'package:dream_pos/services/auth_service.dart';
 import 'package:dream_pos/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -114,15 +116,21 @@ class _ProductListScreenState extends ConsumerState<ProductListScreen> {
                           itemCount: filteredProducts.length,
                           itemBuilder: (_, index) {
                             final product = filteredProducts[index];
-
                             return ProductTableRow(
                               product: product,
 
-                              /// 🗑 DELETE
+                              // 🗑 DELETE
                               onDelete: () {
-                                ref
-                                    .read(productProvider.notifier)
-                                    .removeProductLocally(product.id);
+                                final token = ref
+                                    .read(authProvider)
+                                    .value
+                                    ?.token;
+
+                                if (token != null) {
+                                  ref
+                                      .read(productProvider.notifier)
+                                      .deleteProduct(product.id, token);
+                                }
                               },
 
                               /// ✏️ EDIT

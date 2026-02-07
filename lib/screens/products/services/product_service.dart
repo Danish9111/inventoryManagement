@@ -34,22 +34,41 @@ class ProductService {
         ApiConstants.products,
       ).replace(queryParameters: queryParams);
 
-      debugPrint('Fetching products: $uri');
-
-      final response = await http.get(
-        uri,
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await http
+          .get(uri, headers: {'Content-Type': 'application/json'})
+          .timeout(
+            const Duration(seconds: 15),
+            onTimeout: () {
+              debugPrint('[ProductService] REQUEST TIMEOUT after 15 seconds!');
+              throw Exception(
+                'Request timeout - check your internet connection',
+              );
+            },
+          );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        dynamic data;
+        try {
+          data = jsonDecode(response.body);
+        } catch (e, stack) {
+          rethrow;
+        }
+
         final List<dynamic> productsJson = data['data'] ?? [];
-        return productsJson.map((json) => Product.fromJson(json)).toList();
+
+        final List<Product> products = [];
+        for (int i = 0; i < productsJson.length; i++) {
+          try {
+            products.add(Product.fromJson(productsJson[i]));
+          } catch (e) {
+            rethrow;
+          }
+        }
+        return products;
       } else {
         throw Exception('Failed to load products: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error fetching products: $e');
       rethrow;
     }
   }
@@ -71,7 +90,6 @@ class ProductService {
         throw Exception('Failed to load product: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error fetching product by ID: $e');
       rethrow;
     }
   }
@@ -187,8 +205,11 @@ class ProductService {
       );
 
       if (response.statusCode == 200) {
+        debugPrint('Product deleted successfully');
         return true;
       } else {
+        debugPrint('Product deleted failed ${response.statusCode}');
+
         final body = jsonDecode(response.body);
         throw Exception(body['message'] ?? 'Failed to delete product');
       }
