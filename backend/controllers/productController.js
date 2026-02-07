@@ -167,9 +167,10 @@ const createProduct = async (req, res) => {
             return res.status(400).json({ message: "SKU already exists" });
         }
 
-        // Check for duplicate barcode if provided
-        if (barcode) {
-            const existingBarcode = await Product.findOne({ barcode });
+        // Check for duplicate barcode if provided (and not empty)
+        const cleanBarcode = barcode && barcode.trim() !== '' ? barcode.trim() : null;
+        if (cleanBarcode) {
+            const existingBarcode = await Product.findOne({ barcode: cleanBarcode });
             if (existingBarcode) {
                 return res.status(400).json({ message: "Barcode already exists" });
             }
@@ -190,7 +191,9 @@ const createProduct = async (req, res) => {
             finalSlug = `${productSlug}-${Date.now()}`;
         }
 
-        const product = await Product.create({
+        // Build product data - only include barcode if it has a value
+        // (sparse index requires field to be ABSENT, not null)
+        const productData = {
             name,
             slug: finalSlug,
             sku: sku.toUpperCase(),
@@ -205,12 +208,18 @@ const createProduct = async (req, res) => {
             quantityAlert: quantityAlert || 10,
             description: description || "",
             images: images || [],
-            barcode: barcode || null,
             isFeatured: isFeatured || false,
             hasWarranty: hasWarranty || false,
             expiryDate: expiryDate || null,
             createdBy: req.user._id,
-        });
+        };
+
+        // Only add barcode if it has a value
+        if (cleanBarcode) {
+            productData.barcode = cleanBarcode;
+        }
+
+        const product = await Product.create(productData);
 
         res.status(201).json({
             success: true,
@@ -255,15 +264,20 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        // Check for duplicate barcode if being updated
-        if (req.body.barcode && req.body.barcode !== product.barcode) {
+        // Check for duplicate barcode if being updated (and not empty)
+        const cleanBarcode = req.body.barcode && req.body.barcode.trim() !== ''
+            ? req.body.barcode.trim()
+            : null;
+        if (cleanBarcode && cleanBarcode !== product.barcode) {
             const existingBarcode = await Product.findOne({
-                barcode: req.body.barcode,
+                barcode: cleanBarcode,
             });
             if (existingBarcode) {
                 return res.status(400).json({ message: "Barcode already exists" });
             }
         }
+        // Store cleaned barcode in body for later update
+        req.body.barcode = cleanBarcode;
 
         // Update fields
         const updatableFields = [

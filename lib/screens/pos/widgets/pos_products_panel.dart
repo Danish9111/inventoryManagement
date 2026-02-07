@@ -223,6 +223,26 @@ class PosProductsPanel extends ConsumerWidget {
             ),
           ),
         ),
+
+        // Refresh Button
+        SizedBox(width: r.scale(8, 12)),
+        Container(
+          height: r.searchHeight,
+          width: r.searchHeight,
+          decoration: BoxDecoration(
+            color: AppColors.primaryBlue,
+            borderRadius: BorderRadius.circular(r.scale(10, 14)),
+          ),
+          child: IconButton(
+            onPressed: () => ref.watch(productProvider.notifier).refresh(),
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.white,
+              size: r.scale(20, 24),
+            ),
+            tooltip: 'Refresh Products',
+          ),
+        ),
       ],
     );
   }

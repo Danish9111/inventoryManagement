@@ -25,6 +25,7 @@ class AddProductScreen extends ConsumerStatefulWidget {
 
 class _AddProductScreenState extends ConsumerState<AddProductScreen> {
   late AddProductController controller;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -64,8 +65,8 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
     super.dispose();
   }
 
-  void saveProduct() {
-    // 🔒 Validation
+  /// Validate form fields
+  bool _validate() {
     if (controller.productName.text.isEmpty ||
         controller.slug.text.isEmpty ||
         controller.sku.text.isEmpty ||
@@ -78,13 +79,15 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         controller.brandId == null ||
         controller.unitId == null) {
       showCustomSnackBar(context, description: 'Please fill all the fields');
-      return;
+      return false;
     }
+    return true;
+  }
 
-    final newProduct = Product(
-      id:
-          widget.product?.id ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+  /// Build product from form data
+  Product _buildProduct() {
+    return Product(
+      id: widget.product?.id ?? '',
       name: controller.productName.text,
       description: controller.description.text,
       slug: controller.slug.text,
@@ -102,17 +105,50 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       hasWarranty: controller.hasWarranty,
       images: List.from(controller.images),
     );
+  }
 
-    // ✏️ EDIT PRODUCT
-    if (widget.product != null) {
-      ref.read(productProvider.notifier).updateProductLocally(newProduct);
-    }
-    // ➕ ADD PRODUCT
-    else {
-      ref.read(productProvider.notifier).addProductLocally(newProduct);
-    }
+  /// Save product - delegates to provider
+  Future<void> saveProduct() async {
+    if (!_validate()) return;
 
-    Navigator.pop(context, true);
+    setState(() => _isLoading = true);
+
+    try {
+      final productNotifier = ref.read(productProvider.notifier);
+      final product = _buildProduct();
+
+      if (widget.product != null) {
+        // ✏️ UPDATE PRODUCT
+        await productNotifier.updateProduct(product);
+        if (mounted) {
+          showCustomSnackBar(
+            context,
+            description: 'Product updated successfully!',
+          );
+        }
+      } else {
+        // ➕ CREATE PRODUCT
+        await productNotifier.createProduct(product);
+        if (mounted) {
+          showCustomSnackBar(
+            context,
+            description: 'Product created successfully!',
+          );
+        }
+      }
+
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        showCustomSnackBar(context, description: e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -506,7 +542,9 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
               children: [
                 CustomElevatedButton(
                   text: 'Cancel',
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: _isLoading
+                      ? () {}
+                      : () => Navigator.of(context).pop(),
                   width: 110,
                   height: 40,
                   textSize: 14,
@@ -514,15 +552,21 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
                   backgroundColor: Colors.black,
                 ),
                 const SizedBox(width: 12),
-                CustomElevatedButton(
-                  text: widget.product == null
-                      ? 'Add Product'
-                      : 'Update Product',
-                  onPressed: saveProduct,
-                  width: widget.product == null ? 135 : 155,
-                  height: 40,
-                  textSize: 14,
-                ),
+                _isLoading
+                    ? const SizedBox(
+                        width: 135,
+                        height: 40,
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    : CustomElevatedButton(
+                        text: widget.product == null
+                            ? 'Add Product'
+                            : 'Update Product',
+                        onPressed: saveProduct,
+                        width: widget.product == null ? 135 : 155,
+                        height: 40,
+                        textSize: 14,
+                      ),
               ],
             ),
           ],

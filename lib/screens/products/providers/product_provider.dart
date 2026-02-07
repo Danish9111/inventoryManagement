@@ -1,10 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../services/auth_service.dart';
 import '../../../services/product_service.dart';
 import '../model/product.dart';
 
 /// Product Service provider (singleton)
 final productServiceProvider = Provider<ProductService>((ref) {
   return ProductService();
+});
+
+/// Auth Service provider (singleton)
+final authServiceProvider = Provider<AuthService>((ref) {
+  return AuthService();
 });
 
 /// Products state - AsyncNotifier for modern Riverpod pattern
@@ -27,6 +33,16 @@ class ProductNotifier extends AsyncNotifier<List<Product>> {
       search: search,
       featured: featured,
     );
+  }
+
+  /// Get auth token or throw
+  Future<String> _requireAuth() async {
+    final authService = ref.read(authServiceProvider);
+    final token = await authService.getToken();
+    if (token == null) {
+      throw Exception('Please login as admin to perform this action');
+    }
+    return token;
   }
 
   /// Refresh products from API
@@ -55,14 +71,57 @@ class ProductNotifier extends AsyncNotifier<List<Product>> {
     return await service.getProductByBarcode(barcode);
   }
 
-  /// Add product locally (after API creation)
+  // ============ API METHODS (with auth) ============
+
+  /// Create product via API
+  Future<Product> createProduct(Product product) async {
+    final token = await _requireAuth();
+    final service = ref.read(productServiceProvider);
+    final created = await service.createProduct(product, token);
+
+    // Update local state immediately
+    final currentProducts = state.hasValue ? state.value! : <Product>[];
+    state = AsyncData([...currentProducts, created]);
+
+    return created;
+  }
+
+  /// Update product via API
+  Future<Product> updateProduct(Product product) async {
+    final token = await _requireAuth();
+    final service = ref.read(productServiceProvider);
+    final updated = await service.updateProduct(product.id, product, token);
+
+    // Update local state immediately
+    final currentProducts = state.hasValue ? state.value! : <Product>[];
+    state = AsyncData(
+      currentProducts.map((p) => p.id == updated.id ? updated : p).toList(),
+    );
+
+    return updated;
+  }
+
+  /// Delete product via API
+  Future<void> deleteProduct(String id) async {
+    final token = await _requireAuth();
+    final service = ref.read(productServiceProvider);
+    await service.deleteProduct(id, token);
+
+    // Update local state immediately
+    final currentProducts = state.hasValue ? state.value! : <Product>[];
+    state = AsyncData(currentProducts.where((p) => p.id != id).toList());
+  }
+
+  // ============ LOCAL-ONLY METHODS ============
+
+  /// Add product locally (without API - for optimistic updates)
   void addProductLocally(Product product) {
     state.whenData((products) {
       state = AsyncData([...products, product]);
     });
   }
 
-  /// Update product locally (after API update)
+  /// Update product locally (without API - for optimistic updates)
   void updateProductLocally(Product product) {
     state.whenData((products) {
       state = AsyncData(
@@ -71,7 +130,7 @@ class ProductNotifier extends AsyncNotifier<List<Product>> {
     });
   }
 
-  /// Remove product locally (after API deletion)
+  /// Remove product locally (without API - for optimistic updates)
   void removeProductLocally(String id) {
     state.whenData((products) {
       state = AsyncData(products.where((p) => p.id != id).toList());
