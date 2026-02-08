@@ -1,7 +1,7 @@
 import 'package:dream_pos/providers/auth_provider.dart';
-import 'package:dream_pos/screens/products/ProductListScreen/productListFilters.dart';
-import 'package:dream_pos/screens/products/ProductListScreen/productListHeader.dart';
-import 'package:dream_pos/screens/products/ProductListScreen/productTableHeader.dart';
+import 'package:dream_pos/screens/products/widgets/productListFilters.dart';
+import 'package:dream_pos/screens/products/widgets/productListHeader.dart';
+import 'package:dream_pos/screens/products/widgets/productTableHeader.dart';
 
 import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/screens/products/providers/product_provider.dart';
@@ -10,8 +10,8 @@ import 'package:dream_pos/widgets/top_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../constants/appColors.dart';
-import '../add_product_screen.dart';
+import '../../constants/appColors.dart';
+import 'add_product_screen.dart';
 
 class ProductListScreen extends ConsumerStatefulWidget {
   const ProductListScreen({super.key});

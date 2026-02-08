@@ -7,7 +7,7 @@ class Customer {
   final double totalSpent;
   final int loyaltyPoints;
   final String? imageUrl;
-  final DateTime createdAt;
+  final String createdAt;
 
   Customer({
     required this.id,
@@ -20,6 +20,32 @@ class Customer {
     this.imageUrl,
     required this.createdAt,
   });
+
+  factory Customer.fromJson(Map<String, dynamic> json) {
+    return Customer(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      address: json['address'] ?? '',
+      totalSpent: json['totalSpent'] ?? 0.0,
+      loyaltyPoints: json['loyaltyPoints'] ?? 0,
+      createdAt: json['createdAt'],
+    );
+  }
+
+  Map<String, dynamic> tojson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'totalSpent': totalSpent,
+      'loyaltyPoints': loyaltyPoints,
+      'createdAt': createdAt,
+    };
+  }
 
   Customer copyWith({
     String? name,

@@ -3,7 +3,7 @@ import 'package:dream_pos/screens/customers/customers_screen.dart';
 import 'package:dream_pos/screens/dashboard/dashboard_screen.dart';
 import 'package:dream_pos/screens/expenses/expensesListScreen/expenseListScreen.dart';
 import 'package:dream_pos/screens/pos/pos_screen.dart';
-import 'package:dream_pos/screens/products/ProductListScreen/productListScreen.dart';
+import 'package:dream_pos/screens/products/productListScreen.dart';
 import 'package:dream_pos/screens/reports/reports_screen.dart';
 import 'package:dream_pos/screens/sales/sales_screen.dart';
 import 'package:dream_pos/screens/setting/settings_screen.dart';

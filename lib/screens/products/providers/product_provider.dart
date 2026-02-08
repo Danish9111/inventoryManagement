@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/product_service.dart';
+import '../services/product_service.dart';
 import '../model/product.dart';
 
 /// Product Service provider (singleton)

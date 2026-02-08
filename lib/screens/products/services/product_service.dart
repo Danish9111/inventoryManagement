@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../constants/api_constants.dart';
-import '../screens/products/model/product.dart';
+import '../../../constants/api_constants.dart';
+import '../model/product.dart';
 
 /// Product API Service - Handles all HTTP calls for products
 class ProductService {

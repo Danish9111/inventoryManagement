@@ -3,7 +3,7 @@ import 'package:dream_pos/constants/appColors.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/expenses/expensesListScreen/expenseListScreen.dart';
-import '../screens/products/ProductListScreen/productListScreen.dart';
+import '../screens/products/productListScreen.dart';
 
 class AddNewOverlay {
   static OverlayEntry? _entry;

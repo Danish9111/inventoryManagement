@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'package:dream_pos/screens/customers/services/customer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/auth_provider.dart';
+import 'models/customer_model.dart';
 
 // Assuming these exist based on your imports
 import '../../constants/appColors.dart';
@@ -71,8 +74,36 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
 
   @override
   Widget build(BuildContext context) {
-    final customers = ref.watch(customerProvider);
+    final customersAsync = ref.watch(customerProvider);
 
+    return customersAsync.when(
+      loading: () => const Scaffold(
+        backgroundColor: Color(0xFFF8F9FA),
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        backgroundColor: const Color(0xFFF8F9FA),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Colors.red.shade300),
+              const SizedBox(height: 16),
+              Text('Error loading customers: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => ref.invalidate(customerProvider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (customers) => _buildCustomersList(context, customers),
+    );
+  }
+
+  Widget _buildCustomersList(BuildContext context, List<Customer> customers) {
     final filteredCustomers = customers.where((customer) {
       final query = _searchQuery.toLowerCase();
       final matchesSearch =
@@ -90,7 +121,8 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
         return false;
       }
       if (_activeFilters.contains(CustomerFilter.newCustomer)) {
-        final isNew = customer.createdAt.isAfter(
+        final createdAt = DateTime.parse(customer.createdAt);
+        final isNew = createdAt.isAfter(
           DateTime.now().subtract(const Duration(days: 30)),
         );
         if (!isNew) return false;
@@ -150,6 +182,10 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                     },
                     sortBy: _sortBy,
                     onSortChanged: (sort) {
+                      // final token = ref.read(authProvider).value?.token;
+                      // if (token != null) {
+                      //   CustomerService().getCustomers(token);
+                      // }
                       setState(() {
                         _sortBy = sort;
                       });
