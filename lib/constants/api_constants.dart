@@ -13,6 +13,5 @@ class ApiConstants {
       '$baseUrl/products/barcode/$barcode';
 
   //Customers
-  static const String getCustomers = '$baseUrl/customers';
-  static const String deleteCustomer = '$baseUrl/customers/delete';
+  static const String customers = '$baseUrl/customers';
 }

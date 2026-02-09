@@ -23,20 +23,20 @@ class Customer {
 
   factory Customer.fromJson(Map<String, dynamic> json) {
     return Customer(
-      id: json['id'] ?? '',
+      id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       phone: json['phone'] ?? '',
       address: json['address'] ?? '',
-      totalSpent: json['totalSpent'] ?? 0.0,
+      totalSpent: (json['totalSpent'] ?? 0.0).toDouble(),
       loyaltyPoints: json['loyaltyPoints'] ?? 0,
       createdAt: json['createdAt'],
     );
   }
 
-  Map<String, dynamic> tojson() {
+  Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      '_id': id,
       'name': name,
       'email': email,
       'phone': phone,

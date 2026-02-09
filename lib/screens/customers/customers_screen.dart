@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'package:dream_pos/screens/customers/services/customer_service.dart';
+import 'package:dream_pos/widgets/customSnackBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/auth_provider.dart';
 import 'models/customer_model.dart';
 
 // Assuming these exist based on your imports
@@ -220,18 +219,6 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                         children: [
                           // Fixed Table Header
                           CustomerTableHeader(),
-                          // Container(
-                          //   decoration: BoxDecoration(
-                          //     border: Border(
-                          //       bottom: BorderSide(color: Colors.grey.shade100),
-                          //     ),
-                          //     color: Colors
-                          //         .grey
-                          //         .shade50, // Slight contrast for header
-                          //   ),
-                          //   padding: const EdgeInsets.symmetric(vertical: 12),
-                          //   child: const
-                          // ),
 
                           // Scrollable List
                           Expanded(
@@ -252,9 +239,17 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                                         customer: customer,
                                         onEdit: () {},
                                         onDelete: () {
-                                          ref
-                                              .read(customerProvider.notifier)
-                                              .deleteCustomer(customer.id);
+                                          try {
+                                            ref
+                                                .read(customerProvider.notifier)
+                                                .deleteCustomer(customer.id);
+                                          } catch (e) {
+                                            showCustomSnackBar(
+                                              context,
+                                              description: e.toString(),
+                                            );
+                                            debugPrint(e.toString());
+                                          }
                                         },
                                       );
                                     },

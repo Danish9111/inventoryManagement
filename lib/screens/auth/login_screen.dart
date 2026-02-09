@@ -42,7 +42,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authProvider);
 
     ref.listen(authProvider, (previous, next) {
-      if (next.hasError) {
+      // Only show error if we're transitioning TO an error state (not already in one)
+      if (next.hasError && !(previous?.hasError ?? false)) {
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error.toString().replaceAll('Exception: ', '')),
@@ -51,7 +53,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             width: 400,
           ),
         );
-      } else if (next.value != null) {
+      } else if (next.value != null && previous?.value == null) {
+        // Only navigate if we're transitioning TO having a user
         Navigator.of(
           context,
         ).pushReplacement(MaterialPageRoute(builder: (_) => const AppShell()));
