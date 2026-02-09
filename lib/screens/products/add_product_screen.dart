@@ -6,6 +6,7 @@ import 'package:dream_pos/screens/products/widgets/product_section.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:dream_pos/widgets/customButtons.dart';
 import 'package:dream_pos/widgets/customSnackBar.dart';
+import 'package:dream_pos/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -78,7 +79,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         controller.categoryId == null ||
         controller.brandId == null ||
         controller.unitId == null) {
-      showCustomSnackBar(context, description: 'Please fill all the fields');
+      CustomSnackBar.show(context, message: 'Please fill all the fields');
       return false;
     }
     return true;
@@ -121,18 +122,18 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
         // ✏️ UPDATE PRODUCT
         await productNotifier.updateProduct(product);
         if (mounted) {
-          showCustomSnackBar(
+          CustomSnackBar.show(
             context,
-            description: 'Product updated successfully!',
+            message: 'Product updated successfully!',
           );
         }
       } else {
         // ➕ CREATE PRODUCT
         await productNotifier.createProduct(product);
         if (mounted) {
-          showCustomSnackBar(
+          CustomSnackBar.show(
             context,
-            description: 'Product created successfully!',
+            message: 'Product created successfully!',
           );
         }
       }
@@ -142,7 +143,7 @@ class _AddProductScreenState extends ConsumerState<AddProductScreen> {
       }
     } catch (e) {
       if (mounted) {
-        showCustomSnackBar(context, description: e.toString());
+        CustomSnackBar.show(context, message: e.toString());
       }
     } finally {
       if (mounted) {

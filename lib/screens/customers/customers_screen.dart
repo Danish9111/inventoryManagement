@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:dream_pos/utils/api_result.dart';
 import 'package:dream_pos/widgets/customSnackBar.dart';
+import 'package:dream_pos/widgets/custom_snackbar.dart';
+import 'package:dream_pos/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'models/customer_model.dart';
@@ -28,7 +31,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
   CustomerSort _sortBy = CustomerSort.nameAsc;
   Timer? _debounce;
   final ScrollController _scrollController = ScrollController();
-
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   // Animations
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -50,6 +55,9 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
     _debounce?.cancel();
     _scrollController.dispose();
     super.dispose();
@@ -161,7 +169,7 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                 children: [
                   // 🏷 HEADER SECTION
                   CustomerHeader(
-                    onAddCustomer: () => debugPrint('Add Dialog'),
+                    onAddCustomer: () => _showAddCustomerDialog(context),
                     onRefresh: () {
                       _animationController.reset();
                       _animationController.forward();
@@ -237,16 +245,28 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
                                       final customer = filteredCustomers[index];
                                       return CustomerListTile(
                                         customer: customer,
-                                        onEdit: () {},
+                                        onEdit: () {
+                                          try {
+                                            ref
+                                                .read(customerProvider.notifier)
+                                                .updateCustomer(customer);
+                                          } catch (e) {
+                                            CustomSnackBar.show(
+                                              context,
+                                              message: e.toString(),
+                                            );
+                                            debugPrint(e.toString());
+                                          }
+                                        },
                                         onDelete: () {
                                           try {
                                             ref
                                                 .read(customerProvider.notifier)
                                                 .deleteCustomer(customer.id);
                                           } catch (e) {
-                                            showCustomSnackBar(
+                                            CustomSnackBar.show(
                                               context,
-                                              description: e.toString(),
+                                              message: e.toString(),
                                             );
                                             debugPrint(e.toString());
                                           }
@@ -267,6 +287,128 @@ class _CustomersScreenState extends ConsumerState<CustomersScreen>
           ),
         );
       },
+    );
+  }
+
+  Future _showAddCustomerDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => Consumer(
+        builder: (context, ref, _) {
+          final isLoading = ref.watch(customerOperationLoadingProvider);
+
+          return AlertDialog(
+            backgroundColor: AppColors.white,
+            title: Text("Add Customer"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.person_add, size: 48),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: _nameController,
+                  labelText: "Name",
+                  keyboardType: TextInputType.text,
+                ),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: _phoneController,
+                  labelText: "Phone",
+                  keyboardType: TextInputType.phone,
+                ),
+                SizedBox(height: 16),
+                CustomTextField(
+                  controller: _emailController,
+                  labelText: "Email",
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () => Navigator.pop(dialogContext),
+                child: Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        // Set loading true
+                        ref
+                                .read(customerOperationLoadingProvider.notifier)
+                                .state =
+                            true;
+
+                        try {
+                          final result = await ref
+                              .read(customerProvider.notifier)
+                              .createCustomer(
+                                Customer(
+                                  name: _nameController.text,
+                                  phone: _phoneController.text,
+                                  email: _emailController.text,
+                                  id: "",
+                                  address: "",
+                                  totalSpent: 0,
+                                  loyaltyPoints: 0,
+                                  createdAt: DateTime.now().toString(),
+                                ),
+                              );
+
+                          if (result is Success<Customer>) {
+                            CustomSnackBar.show(
+                              dialogContext,
+                              message:
+                                  result.message ??
+                                  'Customer added successfully',
+                            );
+                            // Clear controllers
+                            _nameController.clear();
+                            _phoneController.clear();
+                            _emailController.clear();
+                          } else if (result is Failure<Customer>) {
+                            CustomSnackBar.show(
+                              dialogContext,
+                              message:
+                                  result.message ?? 'Failed to add customer',
+                              backgroundColor: Colors.red,
+                            );
+                          }
+                          Navigator.pop(dialogContext);
+                        } catch (e) {
+                          CustomSnackBar.show(
+                            dialogContext,
+                            message: e.toString(),
+                            backgroundColor: Colors.red,
+                          );
+                          debugPrint(e.toString());
+                        } finally {
+                          // Set loading false
+                          ref
+                                  .read(
+                                    customerOperationLoadingProvider.notifier,
+                                  )
+                                  .state =
+                              false;
+                        }
+                      },
+                child: isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text("Add"),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 

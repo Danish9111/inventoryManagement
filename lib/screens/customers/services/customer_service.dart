@@ -57,6 +57,34 @@ class CustomerService {
     }
   }
 
+  Future<ApiResult<Customer>> createCustomer(
+    String token,
+    Customer customer,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.customers),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(customer.toJson()),
+      );
+      final jsonBody = jsonDecode(response.body);
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final data = Customer.fromJson(jsonBody['data']);
+        return Success(data, jsonBody['message']);
+      } else {
+        return Failure(
+          message: jsonBody['message'],
+          statusCode: response.statusCode,
+        );
+      }
+    } catch (e) {
+      return Failure(message: e.toString());
+    }
+  }
+
   Future<ApiResult<Customer>> updateCustomer(
     String id,
     String token,

@@ -7,6 +7,7 @@ import 'package:dream_pos/screens/products/widgets/product_section.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:dream_pos/widgets/customButtons.dart';
 import 'package:dream_pos/widgets/customSnackBar.dart';
+import 'package:dream_pos/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/appColors.dart';
@@ -56,17 +57,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (controller.expenseNameController.text.isEmpty ||
         controller.amountController.text.isEmpty ||
         controller.category == null) {
-      showCustomSnackBar(
-        context,
-        description: 'Please fill all required fields',
-      );
+      CustomSnackBar.show(context, message: 'Please fill all required fields');
       return;
     }
 
     final amount = double.tryParse(controller.amountController.text);
 
     if (amount == null || amount <= 0) {
-      showCustomSnackBar(context, description: 'Please enter a valid amount');
+      CustomSnackBar.show(context, message: 'Please enter a valid amount');
       return;
     }
 
