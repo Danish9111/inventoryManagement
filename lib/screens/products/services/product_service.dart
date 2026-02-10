@@ -50,7 +50,7 @@ class ProductService {
         dynamic data;
         try {
           data = jsonDecode(response.body);
-        } catch (e, stack) {
+        } catch (e) {
           rethrow;
         }
 

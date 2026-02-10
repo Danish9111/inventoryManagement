@@ -269,12 +269,12 @@ class _SecurityUIState extends State<SecurityUI> {
           ),
           Switch(
             value: value,
-            activeColor: AppColors.primaryOrange,
+            activeThumbColor: AppColors.primaryOrange,
             inactiveThumbColor: Colors.black,
             inactiveTrackColor: Colors.white,
             activeTrackColor: AppColors.white,
             onChanged: onChanged,
-            trackOutlineColor: MaterialStateProperty.all(
+            trackOutlineColor: WidgetStateProperty.all(
               Colors.black.withOpacity(0.1),
             ),
           ),

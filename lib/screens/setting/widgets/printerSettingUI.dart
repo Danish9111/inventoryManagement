@@ -204,7 +204,7 @@ class _PrinterSettingsUIState extends State<PrinterSettingsUI> {
             Radio<String>(
               value: value,
               activeColor: AppColors.primaryOrange,
-              fillColor: MaterialStateProperty.all(AppColors.primaryOrange),
+              fillColor: WidgetStateProperty.all(AppColors.primaryOrange),
               groupValue: paperSize,
               onChanged: (v) {
                 setState(() => paperSize = v!);

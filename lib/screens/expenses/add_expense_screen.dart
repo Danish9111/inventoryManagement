@@ -1,12 +1,9 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:dream_pos/screens/expenses/controllers/add_expense_controller.dart';
-import 'package:dream_pos/screens/products/model/product.dart';
 import 'package:dream_pos/screens/products/widgets/product_section.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:dream_pos/widgets/customButtons.dart';
-import 'package:dream_pos/widgets/customSnackBar.dart';
 import 'package:dream_pos/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 

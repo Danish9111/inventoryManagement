@@ -1,4 +1,3 @@
-import 'package:dream_pos/providers/auth_provider.dart' as _authService;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';

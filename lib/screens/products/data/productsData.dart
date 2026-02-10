@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dream_pos/screens/products/model/product.dart';
 
 final List<Product> productsList = [

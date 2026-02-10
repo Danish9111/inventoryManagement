@@ -14,7 +14,7 @@ class SummaryCard extends StatefulWidget {
   final Color iconColor;
   final ResponsiveHelper responsive;
 
-  const SummaryCard({
+  const SummaryCard({super.key, 
     required this.icon,
     required this.title,
     required this.value,

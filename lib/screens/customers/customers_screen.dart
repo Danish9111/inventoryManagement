@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:dream_pos/utils/api_result.dart';
-import 'package:dream_pos/widgets/customSnackBar.dart';
 import 'package:dream_pos/widgets/custom_snackbar.dart';
 import 'package:dream_pos/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';

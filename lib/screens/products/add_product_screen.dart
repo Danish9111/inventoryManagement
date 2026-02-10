@@ -5,7 +5,6 @@ import 'package:dream_pos/screens/products/providers/product_provider.dart';
 import 'package:dream_pos/screens/products/widgets/product_section.dart';
 import 'package:dream_pos/screens/products/widgets/product_text_field.dart';
 import 'package:dream_pos/widgets/customButtons.dart';
-import 'package:dream_pos/widgets/customSnackBar.dart';
 import 'package:dream_pos/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

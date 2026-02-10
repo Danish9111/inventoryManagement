@@ -1,6 +1,5 @@
 import 'package:dream_pos/screens/sales/data/sample_sales_data.dart';
 import 'package:dream_pos/screens/sales/models/sale_model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 class SalesNotifier extends StateNotifier<List<Sale>> {
