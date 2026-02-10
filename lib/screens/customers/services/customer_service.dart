@@ -45,7 +45,7 @@ class CustomerService {
       final jsonBody = jsonDecode(response.body);
       print(jsonBody);
       if (response.statusCode == 200) {
-        return Success(jsonBody['data'], jsonBody['message']);
+        return Success(data: jsonBody['data'], message: jsonBody['message']);
       } else {
         return Failure(
           message: jsonBody['message'],
@@ -73,7 +73,7 @@ class CustomerService {
       final jsonBody = jsonDecode(response.body);
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = Customer.fromJson(jsonBody['data']);
-        return Success(data, jsonBody['message']);
+        return Success(data: data, message: jsonBody['message']);
       } else {
         return Failure(
           message: jsonBody['message'],
@@ -101,7 +101,7 @@ class CustomerService {
     final jsonBody = jsonDecode(response.body);
     if (response.statusCode == 200) {
       final data = Customer.fromJson(jsonBody['data']);
-      return Success(data, jsonBody['message']);
+      return Success(data: data, message: jsonBody['message']);
     } else {
       return Failure(
         message: jsonBody['message'],

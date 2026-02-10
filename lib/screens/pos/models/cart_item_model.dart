@@ -1,4 +1,3 @@
-
 import '../../products/model/product.dart';
 
 /// Cart Item Model - represents a product in the cart with quantity
@@ -12,5 +11,12 @@ class CartItem {
 
   CartItem copyWith({int? quantity}) {
     return CartItem(product: product, quantity: quantity ?? this.quantity);
+  }
+
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      product: Product.fromJson(json['product']),
+      quantity: (json['quantity'] ?? 1).toInt(),
+    );
   }
 }

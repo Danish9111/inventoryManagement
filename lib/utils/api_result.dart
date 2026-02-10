@@ -6,7 +6,7 @@ class Success<T> extends ApiResult<T> {
   final T data;
   final String? message;
 
-  const Success(this.data, this.message);
+  const Success({required this.data, this.message});
 }
 
 class Failure<T> extends ApiResult<T> {
